@@ -325,7 +325,7 @@ async def serve_file(path: str):
         data, content_type = get_object(path)
     except Exception:
         raise HTTPException(status_code=404, detail="File not found in storage")
-    return FileResponse(content=data, media_type=record.get("content_type", content_type))
+    return FileResponse(content=data, media_type=record.get("content_type", content_type), headers={"Cache-Control": "no-cache"})
 
 async def seed_admin():
     email = os.environ["ADMIN_EMAIL"].lower()

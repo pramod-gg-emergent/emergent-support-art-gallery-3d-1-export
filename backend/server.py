@@ -213,7 +213,7 @@ async def logout(response: Response):
     return {"ok": True}
 
 class MediaItem(BaseModel):
-    type: Literal["image", "video"]
+    type: Literal["image", "video", "model"]
     url: str
     label: str = ""
 
@@ -264,18 +264,20 @@ async def delete_artwork(slug: str, user=Depends(get_current_user)):
 
 ALLOWED_IMAGE_EXTS = {"jpg", "jpeg", "png", "webp", "gif"}
 ALLOWED_VIDEO_EXTS = {"mp4", "webm", "mov"}
+ALLOWED_MODEL_EXTS = {"mview"}
 
 @api_router.post("/upload", status_code=201)
 async def upload_image(file: UploadFile = File(...), user=Depends(get_current_user)):
     ext = file.filename.split(".")[-1].lower() if "." in file.filename else ""
-    if ext not in ALLOWED_IMAGE_EXTS | ALLOWED_VIDEO_EXTS:
-        raise HTTPException(status_code=400, detail="Only images (jpg, png, webp, gif) or videos (mp4, webm, mov) are allowed")
-    kind = "video" if ext in ALLOWED_VIDEO_EXTS else "image"
+    if ext not in ALLOWED_IMAGE_EXTS | ALLOWED_VIDEO_EXTS | ALLOWED_MODEL_EXTS:
+        raise HTTPException(status_code=400, detail="Only images, videos (mp4, webm, mov) or Marmoset .mview scenes are allowed")
+    kind = "video" if ext in ALLOWED_VIDEO_EXTS else "model" if ext in ALLOWED_MODEL_EXTS else "image"
     data = await file.read()
-    limit = 150 * 1024 * 1024 if kind == "video" else 15 * 1024 * 1024
+    limit = 15 * 1024 * 1024 if kind == "image" else 150 * 1024 * 1024
     if len(data) > limit:
-        raise HTTPException(status_code=400, detail="Images must be under 15MB, videos under 150MB")
-    content_type = file.content_type or ("video/mp4" if kind == "video" else "image/jpeg")
+        raise HTTPException(status_code=400, detail="Images must be under 15MB, videos and 3D scenes under 150MB")
+    default_type = {"image": "image/jpeg", "video": "video/mp4", "model": "application/octet-stream"}[kind]
+    content_type = file.content_type or default_type
     path = f"{APP_NAME}/uploads/{uuid.uuid4()}.{ext}"
     result = put_object(path, data, content_type)
     await db.files.insert_one({

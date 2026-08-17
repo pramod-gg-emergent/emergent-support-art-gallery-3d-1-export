@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
+import MarmosetViewer from "@/components/portfolio/MarmosetViewer";
 
 const FILTERS = [
   { key: "all", label: "All" },
@@ -142,9 +143,12 @@ export default function Gallery({ artworks }) {
                   ];
                   const active = media[Math.min(activeMedia, media.length - 1)];
                   const isVideo = active.type === "video";
+                  const isModel = active.type === "model";
                   return (
                     <>
-                      {isVideo ? (
+                      {isModel ? (
+                        <MarmosetViewer key={active.url} url={active.url} />
+                      ) : isVideo ? (
                         <video
                           key={active.url}
                           src={active.url}
@@ -186,6 +190,10 @@ export default function Gallery({ artworks }) {
                               {m.type === "video" ? (
                                 <span className="font-code flex h-full w-full items-center justify-center bg-black text-[9px] uppercase tracking-[0.15em] text-[#00F0FF]">
                                   Video
+                                </span>
+                              ) : m.type === "model" ? (
+                                <span className="font-code flex h-full w-full items-center justify-center bg-black text-[9px] uppercase tracking-[0.15em] text-[#FF003C]">
+                                  3D
                                 </span>
                               ) : (
                                 <img src={m.url} alt={m.label} className="h-full w-full object-cover" />

@@ -21,6 +21,10 @@ const inputCls =
 const labelCls = "font-code mb-2 block text-[10px] uppercase tracking-[0.25em] text-white/50";
 
 const VIDEO_RE = /\.(mp4|webm|mov)(\?|$)/i;
+const MODEL_RE = /\.mview(\?|$)/i;
+
+const detectType = (url, fallback) =>
+  VIDEO_RE.test(url) ? "video" : MODEL_RE.test(url) ? "model" : fallback;
 
 export default function ArtworkForm({ initial, onSave, onCancel }) {
   const [form, setForm] = useState(
@@ -57,8 +61,8 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
     setError("");
     try {
       const r = await uploadFile(file);
-      if (r.kind === "video") {
-        setError("Cover must be an image — add videos under Extra Media");
+      if (r.kind !== "image") {
+        setError("Cover must be an image — add videos and 3D scenes under Extra Media");
       } else {
         setForm((f) => ({ ...f, image: r.url }));
       }
@@ -92,7 +96,7 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
     }
     const media = form.media
       .filter((m) => m.url)
-      .map((m) => ({ ...m, type: VIDEO_RE.test(m.url) ? "video" : m.type }));
+      .map((m) => ({ ...m, type: detectType(m.url, m.type) }));
     if (media.some((m) => !m.label.trim())) {
       setError("Give every extra media item a label (e.g. Wireframe, UV Map, Turntable)");
       return;
@@ -196,7 +200,7 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
         <label className={labelCls}>Extra Media — wireframes, UV maps, alt renders, videos</label>
         {form.media.map((m, i) => (
           <div key={i} className="mb-3 flex flex-col gap-3 border border-white/10 p-4 md:flex-row md:items-center" data-testid={`media-row-${i}`}>
-            {m.url && m.type !== "video" && !VIDEO_RE.test(m.url) ? (
+            {m.url && m.type !== "video" && m.type !== "model" && !VIDEO_RE.test(m.url) && !MODEL_RE.test(m.url) ? (
               <img
                 src={m.url.startsWith("/api/") ? `${BACKEND}${m.url}` : m.url}
                 alt={m.label || "Media preview"}
@@ -204,7 +208,7 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
               />
             ) : m.url ? (
               <span className="font-code flex h-14 w-20 shrink-0 items-center justify-center border border-white/10 text-[9px] uppercase tracking-[0.2em] text-[#00F0FF]">
-                Video
+                {m.type === "model" || MODEL_RE.test(m.url) ? "3D" : "Video"}
               </span>
             ) : (
               <span className="h-14 w-20 shrink-0 border border-dashed border-white/15" />
@@ -218,7 +222,7 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
             />
             <input
               value={m.url}
-              onChange={(e) => setMedia(i, { url: e.target.value, type: VIDEO_RE.test(e.target.value) ? "video" : "image" })}
+              onChange={(e) => setMedia(i, { url: e.target.value, type: detectType(e.target.value, "image") })}
               placeholder="Paste URL or upload"
               className={`${inputCls} flex-1`}
               data-testid={`media-url-${i}`}
@@ -236,7 +240,7 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
               <input
                 ref={(el) => (mediaRefs.current[i] = el)}
                 type="file"
-                accept="image/*,video/*"
+                accept="image/*,video/*,.mview"
                 onChange={(e) => onMediaUpload(i, e)}
                 className="hidden"
                 data-testid={`media-file-${i}`}

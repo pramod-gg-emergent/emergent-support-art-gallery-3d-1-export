@@ -18,6 +18,11 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 3)
+- Marmoset Viewer support: .mview uploads (150MB cap), media type "model", interactive 3D viewer embedded in the artwork detail modal via official marmoset.js (viewer.marmoset.co)
+- Admin form accepts .mview per media row, shows "3D" chip; public modal shows "3D" thumbnail chip and mounts WebViewer
+- Note: mview preview thumbnails ideally need Accept-Ranges; our file endpoint sends Content-Length (full download) — core viewing works
+
 ## Implemented (2026-08-17, update 2)
 - Multi-media per artwork: media[] array (type image|video, url, label) on the artwork model
 - Admin form "Extra Media" section: add/remove rows, per-row upload or URL paste, labels (Wireframe, UV Map, Turntable...), video detection by extension

@@ -279,20 +279,22 @@ async def delete_artwork(slug: str, user=Depends(get_current_user)):
 
 def grade_image(data: bytes, ext: str):
     img = Image.open(io.BytesIO(data))
+    has_alpha = img.mode in ("RGBA", "LA") or (img.mode == "P" and "transparency" in img.info)
     if img.mode not in ("RGB", "RGBA"):
-        img = img.convert("RGB")
+        img = img.convert("RGBA" if has_alpha else "RGB")
+    if max(img.size) > 2560:
+        ratio = 2560 / max(img.size)
+        img = img.resize((round(img.size[0] * ratio), round(img.size[1] * ratio)), Image.LANCZOS)
     img = ImageEnhance.Contrast(img).enhance(1.06)
     img = ImageEnhance.Color(img).enhance(1.08)
     img = ImageEnhance.Sharpness(img).enhance(1.35)
     img = ImageEnhance.Brightness(img).enhance(1.02)
     buf = io.BytesIO()
-    if ext == "png":
+    if ext == "png" and has_alpha:
         img.save(buf, "PNG")
         return buf.getvalue(), "image/png"
-    if img.mode == "RGBA":
-        img = img.convert("RGB")
-    img.save(buf, "JPEG", quality=92)
-    return buf.getvalue(), "image/jpeg"
+    img.convert("RGB").save(buf, "WEBP", quality=88)
+    return buf.getvalue(), "image/webp"
 
 ALLOWED_IMAGE_EXTS = {"jpg", "jpeg", "png", "webp", "gif"}
 ALLOWED_VIDEO_EXTS = {"mp4", "webm", "mov"}

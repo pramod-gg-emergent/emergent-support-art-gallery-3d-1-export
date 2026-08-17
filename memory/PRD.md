@@ -18,6 +18,11 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 18)
+- Cursor-following hover preview popup in the Archive: mini artwork thumbnail + title + VIEW chip springs along with the cursor across cards (desktop only)
+- Image performance overhaul: uploads now capped at 2560px and re-encoded WebP q88 (PNG kept only for real alpha); one-off optimizer compressed all existing 4K/8K uploads (8–28MB → 200–700KB); fixed modal black-box slow loading
+- Save button now locks while any media upload is in flight (prevents empty media rows)
+
 ## Implemented (2026-08-17, update 17)
 - Freeze fix: artwork modal backdrop + panel now set pointer-events:none the instant closing starts — a stalled exit animation (hidden tab, throttled rAF) can no longer leave an invisible full-screen layer swallowing clicks
 

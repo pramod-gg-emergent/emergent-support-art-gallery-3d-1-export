@@ -326,7 +326,7 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
       <div className="mt-8 flex gap-4">
         <button
           type="submit"
-          disabled={saving || uploading}
+          disabled={saving || uploading || mediaUploading !== -1}
           className="font-code border border-[#00F0FF] px-6 py-3 text-[11px] uppercase tracking-[0.3em] text-[#00F0FF] transition-colors duration-300 hover:bg-[#00F0FF] hover:text-black disabled:opacity-40"
           data-testid="form-submit-btn"
         >

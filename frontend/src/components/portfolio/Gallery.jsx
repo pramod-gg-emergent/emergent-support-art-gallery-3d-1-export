@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring } from "framer-motion";
 import { X } from "lucide-react";
 import MarmosetViewer from "@/components/portfolio/MarmosetViewer";
 
@@ -69,6 +69,11 @@ export default function Gallery({ artworks }) {
   const [zoomed, setZoomed] = useState(false);
   const [pan, setPan] = useState({ tx: 0, ty: 0 });
   const ZOOM = 2.2;
+  const [hovered, setHovered] = useState(null);
+  const cursorX = useMotionValue(0);
+  const cursorY = useMotionValue(0);
+  const springX = useSpring(cursorX, { stiffness: 300, damping: 28 });
+  const springY = useSpring(cursorY, { stiffness: 300, damping: 28 });
 
   useEffect(() => {
     setActiveMedia(0);
@@ -88,7 +93,15 @@ export default function Gallery({ artworks }) {
   }, []);
 
   return (
-    <section id="work" className="px-6 py-24 md:px-12 md:py-36" data-testid="gallery-section">
+    <section
+      id="work"
+      className="px-6 py-24 md:px-12 md:py-36"
+      data-testid="gallery-section"
+      onMouseMove={(e) => {
+        cursorX.set(e.clientX);
+        cursorY.set(e.clientY);
+      }}
+    >
       <div className="mb-14 flex flex-col justify-between gap-8 md:flex-row md:items-end">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -137,6 +150,8 @@ export default function Gallery({ artworks }) {
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.8, delay: (i % 3) * 0.08, ease: [0.16, 1, 0.3, 1] }}
               onClick={() => setSelected(art)}
+              onMouseEnter={() => setHovered(art)}
+              onMouseLeave={() => setHovered(null)}
               className={`group relative h-[52vh] overflow-hidden border border-white/10 text-left ${SPANS[i % SPANS.length]}`}
               data-testid={`artwork-card-${art.slug}`}
             >
@@ -176,6 +191,32 @@ export default function Gallery({ artworks }) {
       )}
 
       <AnimatePresence>
+        {hovered && !selected && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.15 } }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="pointer-events-none fixed left-0 top-0 z-[80] hidden md:block"
+            style={{ x: springX, y: springY }}
+            data-testid="archive-hover-preview"
+          >
+            <div className="w-52 -translate-x-1/2 -translate-y-[110%] border border-[#00F0FF]/40 bg-black/90 p-2 shadow-[0_0_30px_rgba(0,240,255,0.15)] backdrop-blur-md">
+              <img src={hovered.image} alt="" className="h-28 w-full object-cover" />
+              <div className="flex items-center justify-between px-1 pb-1 pt-2">
+                <p className="font-code text-[10px] uppercase tracking-[0.2em] text-white">
+                  {hovered.title}
+                </p>
+                <span className="font-code text-[9px] uppercase tracking-[0.2em] text-[#00F0FF]">
+                  View
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
         {selected && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -201,7 +242,13 @@ export default function Gallery({ artworks }) {
               onClick={(e) => e.stopPropagation()}
             >
               {selected.stack && (
-                <div className="flex shrink-0 flex-col" data-testid="artwork-modal-stack">
+                <motion.div
+                  initial={{ scale: 0.94, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  className="flex shrink-0 flex-col"
+                  data-testid="artwork-modal-stack"
+                >
                   {(() => {
                     const all =
                       selected.media && selected.media.length
@@ -252,7 +299,7 @@ export default function Gallery({ artworks }) {
                       </>
                     );
                   })()}
-                </div>
+                </motion.div>
               )}
               {!selected.stack && (
               <div

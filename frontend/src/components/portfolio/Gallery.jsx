@@ -180,7 +180,7 @@ export default function Gallery({ artworks }) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            exit={{ opacity: 0, pointerEvents: "none", transition: { duration: 0.25 } }}
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-md md:p-10"
             onClick={() => setSelected(null)}
             data-testid="artwork-modal"
@@ -189,7 +189,7 @@ export default function Gallery({ artworks }) {
               data-lenis-prevent
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 60, opacity: 0 }}
+              exit={{ y: 60, opacity: 0, pointerEvents: "none", transition: { duration: 0.25 } }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className={`max-h-[90vh] w-full border border-white/10 bg-[#0a0a0a] ${
                 selected.stack

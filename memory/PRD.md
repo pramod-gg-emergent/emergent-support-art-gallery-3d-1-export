@@ -18,6 +18,9 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 17)
+- Freeze fix: artwork modal backdrop + panel now set pointer-events:none the instant closing starts — a stalled exit animation (hidden tab, throttled rAF) can no longer leave an invisible full-screen layer swallowing clicks
+
 ## Implemented (2026-08-17, update 16)
 - Hybrid vertical-story mode: per-media "stacked" flag (Vert toggle in admin form). In stack view, flagged images form the seamless vertical composition; other media appear below in a labeled section with zoom/3D support. Bloody Bat configured: Barrel/Body/Grip = composition, rest = extras
 

@@ -29,7 +29,7 @@ export default function Nav() {
           data-testid="nav-logo"
         >
           <span className="font-display text-lg font-extrabold tracking-tight">
-            KV<span className="text-[#00F0FF]">.</span>
+            AD<span className="text-[#00F0FF]">.</span>
           </span>
           <span className="font-code hidden text-[10px] uppercase tracking-[0.3em] text-white/50 sm:block">
             Kai Voss

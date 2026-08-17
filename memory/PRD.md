@@ -18,6 +18,12 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update)
+- Admin panel: JWT cookie auth (12h token, bcrypt, brute-force lockout 5 tries/15 min), routes /admin/login and /admin
+- Admin CRUD: create/edit/delete artworks with form (title, category, year, software, polycount, description)
+- Image uploads via Emergent object storage: POST /api/upload (protected), public serving at /api/files/{path}, file records in Mongo with soft-delete
+- Seed switched to $setOnInsert so admin edits survive restarts
+
 ## Implemented (2026-08-17)
 - Kinetic masked line-by-line hero reveal ("WORLDS / BUILT FROM / POLYGONS"), ember particles, mouse + scroll parallax clipped artwork frame, stats bar
 - Slow editorial outline-text marquee
@@ -30,10 +36,9 @@
 Artist identity "Kai Voss", stats, bio and artwork descriptions are PLACEHOLDER copy using stock imagery — user should supply real name, renders, links.
 
 ## Backlog
-- P0: Replace placeholder artworks/copy with user's real renders (needs upload mechanism or CMS)
-- P1: Admin panel to add/edit artworks
+- P0: Replace placeholder artworks/copy with user's real renders (now possible via /admin)
 - P1: Video/turntable embeds per artwork
-- P2: Blog/wip section, case-study pages per artwork, OG meta + favicon
+- P2: Blog/wip section, case-study pages per artwork, OG meta + favicon, artwork ordering (drag to reorder)
 
 ## Test Credentials
 No auth — public site. See /app/memory/test_credentials.md.

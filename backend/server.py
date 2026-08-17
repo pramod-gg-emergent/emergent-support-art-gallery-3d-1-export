@@ -1,13 +1,23 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, UploadFile, File, Depends
+from fastapi.responses import Response as FileResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from pydantic import BaseModel
+from typing import List, Literal
 import os
+import re
+import uuid
 import logging
 from pathlib import Path
+from datetime import datetime, timezone, timedelta
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+import bcrypt
+import jwt
+import requests
 
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
@@ -15,6 +25,67 @@ db = client[os.environ['DB_NAME']]
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
+
+JWT_ALGORITHM = "HS256"
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
+
+def create_access_token(user_id: str, email: str) -> str:
+    payload = {"sub": user_id, "email": email, "exp": datetime.now(timezone.utc) + timedelta(hours=12), "type": "access"}
+    return jwt.encode(payload, os.environ["JWT_SECRET"], algorithm=JWT_ALGORITHM)
+
+async def get_current_user(request: Request) -> dict:
+    token = request.cookies.get("access_token")
+    if not token:
+        auth = request.headers.get("Authorization", "")
+        if auth.startswith("Bearer "):
+            token = auth[7:]
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        payload = jwt.decode(token, os.environ["JWT_SECRET"], algorithms=[JWT_ALGORITHM])
+        if payload.get("type") != "access":
+            raise HTTPException(status_code=401, detail="Invalid token type")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    user = await db.users.find_one({"email": payload["email"]}, {"_id": 0, "password_hash": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    return user
+
+STORAGE_BASE = (os.environ.get("INTEGRATION_PROXY_URL") or "").strip() or "https://integrations.emergentagent.com"
+STORAGE_URL = STORAGE_BASE.rstrip("/") + "/objstore/api/v1/storage"
+APP_NAME = "kai-voss-portfolio"
+storage_key = None
+
+def init_storage(force: bool = False):
+    global storage_key
+    if storage_key and not force:
+        return storage_key
+    resp = requests.post(f"{STORAGE_URL}/init", json={"emergent_key": os.environ.get("EMERGENT_LLM_KEY")}, timeout=30)
+    resp.raise_for_status()
+    storage_key = resp.json()["storage_key"]
+    return storage_key
+
+def put_object(path: str, data: bytes, content_type: str) -> dict:
+    resp = requests.put(
+        f"{STORAGE_URL}/objects/{path}",
+        headers={"X-Storage-Key": init_storage(), "Content-Type": content_type},
+        data=data, timeout=120,
+    )
+    resp.raise_for_status()
+    return resp.json()
+
+def get_object(path: str):
+    resp = requests.get(f"{STORAGE_URL}/objects/{path}", headers={"X-Storage-Key": init_storage()}, timeout=60)
+    resp.raise_for_status()
+    return resp.content, resp.headers.get("Content-Type", "application/octet-stream")
 
 ARTWORKS = [
     {
@@ -104,17 +175,155 @@ async def get_artwork(slug: str):
         raise HTTPException(status_code=404, detail="Artwork not found")
     return art
 
+class LoginIn(BaseModel):
+    email: str
+    password: str
+
+@api_router.post("/auth/login")
+async def login(input: LoginIn, request: Request, response: Response):
+    email = input.email.lower().strip()
+    identifier = f"{request.client.host}:{email}"
+    attempts = await db.login_attempts.find_one({"identifier": identifier})
+    if attempts and attempts.get("count", 0) >= 5:
+        updated = attempts.get("updated_at")
+        if updated and updated.tzinfo is None:
+            updated = updated.replace(tzinfo=timezone.utc)
+        if updated and datetime.now(timezone.utc) - updated < timedelta(minutes=15):
+            raise HTTPException(status_code=429, detail="Too many failed attempts. Try again in 15 minutes.")
+    user = await db.users.find_one({"email": email})
+    if not user or not verify_password(input.password, user["password_hash"]):
+        await db.login_attempts.update_one(
+            {"identifier": identifier},
+            {"$inc": {"count": 1}, "$set": {"updated_at": datetime.now(timezone.utc)}},
+            upsert=True,
+        )
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    await db.login_attempts.delete_one({"identifier": identifier})
+    token = create_access_token(str(user["_id"]), email)
+    response.set_cookie(key="access_token", value=token, httponly=True, secure=True, samesite="none", max_age=43200, path="/")
+    return {"email": email, "name": user.get("name", "Admin"), "role": user.get("role", "admin")}
+
+@api_router.get("/auth/me")
+async def auth_me(user=Depends(get_current_user)):
+    return user
+
+@api_router.post("/auth/logout")
+async def logout(response: Response):
+    response.delete_cookie("access_token", path="/")
+    return {"ok": True}
+
+class ArtworkIn(BaseModel):
+    title: str
+    category: Literal["characters", "environments", "props"]
+    year: int
+    image: str
+    description: str
+    software: List[str]
+    polycount: str
+
+def slugify(title: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-") or "artwork"
+
+@api_router.post("/artworks", status_code=201)
+async def create_artwork(input: ArtworkIn, user=Depends(get_current_user)):
+    doc = input.model_dump()
+    base = slugify(doc["title"])
+    slug = base
+    n = 2
+    while await db.artworks.find_one({"slug": slug}):
+        slug = f"{base}-{n}"
+        n += 1
+    doc["slug"] = slug
+    await db.artworks.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+@api_router.put("/artworks/{slug}")
+async def update_artwork(slug: str, input: ArtworkIn, user=Depends(get_current_user)):
+    result = await db.artworks.update_one({"slug": slug}, {"$set": input.model_dump()})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Artwork not found")
+    return await db.artworks.find_one({"slug": slug}, {"_id": 0})
+
+@api_router.delete("/artworks/{slug}")
+async def delete_artwork(slug: str, user=Depends(get_current_user)):
+    art = await db.artworks.find_one({"slug": slug})
+    if not art:
+        raise HTTPException(status_code=404, detail="Artwork not found")
+    if art.get("image", "").startswith("/api/files/"):
+        path = art["image"].replace("/api/files/", "", 1)
+        await db.files.update_one({"storage_path": path}, {"$set": {"is_deleted": True}})
+    await db.artworks.delete_one({"slug": slug})
+    return {"ok": True}
+
+ALLOWED_IMAGE_EXTS = {"jpg", "jpeg", "png", "webp", "gif"}
+
+@api_router.post("/upload", status_code=201)
+async def upload_image(file: UploadFile = File(...), user=Depends(get_current_user)):
+    ext = file.filename.split(".")[-1].lower() if "." in file.filename else ""
+    if ext not in ALLOWED_IMAGE_EXTS:
+        raise HTTPException(status_code=400, detail="Only jpg, png, webp or gif images are allowed")
+    data = await file.read()
+    if len(data) > 15 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Image must be under 15MB")
+    path = f"{APP_NAME}/uploads/{uuid.uuid4()}.{ext}"
+    result = put_object(path, data, file.content_type or "image/jpeg")
+    await db.files.insert_one({
+        "id": str(uuid.uuid4()),
+        "storage_path": result["path"],
+        "original_filename": file.filename,
+        "content_type": file.content_type or "image/jpeg",
+        "size": result.get("size", len(data)),
+        "is_deleted": False,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"path": result["path"], "url": f"/api/files/{result['path']}"}
+
+@api_router.get("/files/{path:path}")
+async def serve_file(path: str):
+    record = await db.files.find_one({"storage_path": path, "is_deleted": False})
+    if not record:
+        raise HTTPException(status_code=404, detail="File not found")
+    try:
+        data, content_type = get_object(path)
+    except Exception:
+        raise HTTPException(status_code=404, detail="File not found in storage")
+    return FileResponse(content=data, media_type=record.get("content_type", content_type))
+
+async def seed_admin():
+    email = os.environ["ADMIN_EMAIL"].lower()
+    password = os.environ["ADMIN_PASSWORD"]
+    existing = await db.users.find_one({"email": email})
+    if existing is None:
+        await db.users.insert_one({
+            "email": email,
+            "password_hash": hash_password(password),
+            "name": "Kai Voss",
+            "role": "admin",
+            "created_at": datetime.now(timezone.utc),
+        })
+    elif not verify_password(password, existing["password_hash"]):
+        await db.users.update_one({"email": email}, {"$set": {"password_hash": hash_password(password)}})
+
 @app.on_event("startup")
-async def seed_artworks():
+async def startup():
+    await db.users.create_index("email", unique=True)
+    await db.login_attempts.create_index("identifier")
+    await seed_admin()
     for art in ARTWORKS:
-        await db.artworks.update_one({"slug": art["slug"]}, {"$set": art}, upsert=True)
+        await db.artworks.update_one({"slug": art["slug"]}, {"$setOnInsert": art}, upsert=True)
+    try:
+        init_storage()
+        logger.info("Object storage initialized")
+    except Exception as e:
+        logger.error(f"Storage init failed: {e}")
 
 app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=[os.environ.get("FRONTEND_URL", "http://localhost:3000")],
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Lenis from "lenis";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "@/App.css";
 import Nav from "@/components/portfolio/Nav";
 import Hero from "@/components/portfolio/Hero";
@@ -9,10 +10,12 @@ import Gallery from "@/components/portfolio/Gallery";
 import Manifesto from "@/components/portfolio/Manifesto";
 import About from "@/components/portfolio/About";
 import Footer from "@/components/portfolio/Footer";
+import AdminLogin from "@/components/admin/AdminLogin";
+import AdminDashboard from "@/components/admin/AdminDashboard";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export default function App() {
+function Portfolio() {
   const [artworks, setArtworks] = useState([]);
 
   useEffect(() => {
@@ -52,5 +55,17 @@ export default function App() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Portfolio />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

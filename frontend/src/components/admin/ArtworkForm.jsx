@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import axios from "axios";
-import { X } from "lucide-react";
+import { X, ArrowUp, ArrowDown } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const BACKEND = process.env.REACT_APP_BACKEND_URL;
@@ -47,6 +47,14 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
     setForm((f) => ({ ...f, media: [...f.media, { type: "image", url: "", label: "" }] }));
   const removeMedia = (i) =>
     setForm((f) => ({ ...f, media: f.media.filter((_, idx) => idx !== i) }));
+  const moveMedia = (i, dir) =>
+    setForm((f) => {
+      const j = i + dir;
+      if (j < 0 || j >= f.media.length) return f;
+      const next = [...f.media];
+      [next[i], next[j]] = [next[j], next[i]];
+      return { ...f, media: next };
+    });
 
   const uploadFile = async (file) => {
     const data = new FormData();
@@ -244,6 +252,26 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
               data-testid={`media-url-${i}`}
             />
             <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => moveMedia(i, -1)}
+                disabled={i === 0}
+                className="flex items-center border border-white/20 px-2 py-2 text-white/70 transition-colors duration-300 hover:border-[#00F0FF] hover:text-[#00F0FF] disabled:opacity-25"
+                data-testid={`media-up-${i}`}
+                aria-label="Move media up"
+              >
+                <ArrowUp size={12} />
+              </button>
+              <button
+                type="button"
+                onClick={() => moveMedia(i, 1)}
+                disabled={i === form.media.length - 1}
+                className="flex items-center border border-white/20 px-2 py-2 text-white/70 transition-colors duration-300 hover:border-[#00F0FF] hover:text-[#00F0FF] disabled:opacity-25"
+                data-testid={`media-down-${i}`}
+                aria-label="Move media down"
+              >
+                <ArrowDown size={12} />
+              </button>
               <button
                 type="button"
                 onClick={() => mediaRefs.current[i]?.click()}

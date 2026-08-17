@@ -18,6 +18,11 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 15)
+- Bloody Bat expanded: 3 new renders (watermark-cleaned; Angle 03 restored from original and re-cleaned with sticker-safe white-cluster mask after first pass nicked the zombie sticker), texture maps sheet, and real BaseballView.mview 3D model. Stack mode turned off per user (now standard viewer with 9 thumbnails)
+- Media reorder: up/down arrows on each media row in the admin form
+- Scripts in /app/scripts (persistent): remove_watermark.py, remove_red_mark.py, fix_bat5.py
+
 ## Implemented (2026-08-17, update 14)
 - Red "5" overlay mark inpainted off all 4 knife renders (red-dominant corner mask, ~800px) — script /app/scripts/remove_red_mark.py
 - Artwork ordering: order field on artworks, sorted GET, POST /api/artworks/reorder (protected), startup normalizes order; studio rows have up/down arrow controls persisting instantly

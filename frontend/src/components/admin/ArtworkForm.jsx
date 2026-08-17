@@ -14,6 +14,7 @@ const EMPTY = {
   software: "",
   polycount: "",
   media: [],
+  stack: false,
 };
 
 const inputCls =
@@ -29,7 +30,7 @@ const detectType = (url, fallback) =>
 export default function ArtworkForm({ initial, onSave, onCancel }) {
   const [form, setForm] = useState(
     initial
-      ? { ...initial, software: initial.software.join(", "), media: initial.media || [] }
+      ? { ...initial, software: initial.software.join(", "), media: initial.media || [], stack: !!initial.stack }
       : EMPTY
   );
   const [saving, setSaving] = useState(false);
@@ -112,6 +113,7 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
       software: form.software.split(",").map((s) => s.trim()).filter(Boolean),
       polycount: form.polycount,
       media,
+      stack: !!form.stack,
     };
     try {
       if (initial) {
@@ -196,6 +198,19 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
             <img src={previewSrc} alt="Preview" className="h-28 w-44 border border-white/10 object-cover" data-testid="form-image-preview" />
           )}
         </div>
+      </div>
+      <div className="mt-6 flex items-center gap-4 border border-white/10 px-4 py-3">
+        <input
+          id="stack-toggle"
+          type="checkbox"
+          checked={!!form.stack}
+          onChange={(e) => setForm({ ...form, stack: e.target.checked })}
+          className="h-4 w-4 accent-[#00F0FF]"
+          data-testid="form-stack-toggle"
+        />
+        <label htmlFor="stack-toggle" className="font-code text-[10px] uppercase tracking-[0.25em] text-white/60">
+          Vertical story layout — stack all images seamlessly like ArtStation
+        </label>
       </div>
       <div className="mt-6">
         <label className={labelCls}>Extra Media — wireframes, UV maps, alt renders, videos</label>

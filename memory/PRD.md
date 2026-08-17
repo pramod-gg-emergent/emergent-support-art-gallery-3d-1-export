@@ -18,6 +18,10 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 12)
+- Vertical story layout per artwork (stack flag, admin toggle): images stack seamlessly ArtStation-style; Bloody Bat enabled with Barrel/Body/Grip order. Scroll fix via data-lenis-prevent, per-image click-to-zoom in stack mode, enlarged info panel, flex shrink-0 fix
+- Marmoset watermark inpainted out of all 3 Bloody Bat renders (OpenCV corner inpaint, same storage paths) — script at /app/scripts/remove_watermark.py
+
 ## Implemented (2026-08-17, update 11)
 - First real artwork published: BLOODY BAT (props, 2025) with 3 user renders — hero + "Barbed Wire Detail" + "Grip Detail", graded and served from object storage
 

@@ -3,6 +3,39 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import MarmosetViewer from "@/components/portfolio/MarmosetViewer";
 
+function StackImage({ src, alt, testId }) {
+  const [zoomed, setZoomed] = useState(false);
+  const [pan, setPan] = useState({ tx: 0, ty: 0 });
+  const Z = 2.2;
+  return (
+    <div
+      className={`relative overflow-hidden ${zoomed ? "cursor-zoom-out" : "cursor-zoom-in"}`}
+      onClick={() => setZoomed((z) => !z)}
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        const fx = (e.clientX - r.left) / r.width;
+        const fy = (e.clientY - r.top) / r.height;
+        const clamp = (v, min) => Math.min(0, Math.max(min, v));
+        setPan({
+          tx: clamp(r.width / 2 - Z * fx * r.width, r.width * (1 - Z)),
+          ty: clamp(r.height / 2 - Z * fy * r.height, r.height * (1 - Z)),
+        });
+      }}
+      data-testid={testId}
+    >
+      <img
+        src={src}
+        alt={alt}
+        className="block w-full transition-transform duration-300 ease-out"
+        style={{
+          transform: zoomed ? `translate(${pan.tx}px, ${pan.ty}px) scale(${Z})` : "scale(1)",
+          transformOrigin: "0 0",
+        }}
+      />
+    </div>
+  );
+}
+
 const FILTERS = [
   { key: "all", label: "All" },
   { key: "characters", label: "Characters" },
@@ -153,17 +186,44 @@ export default function Gallery({ artworks }) {
             data-testid="artwork-modal"
           >
             <motion.div
+              data-lenis-prevent
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 60, opacity: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className={`max-h-[90vh] w-full border border-white/10 bg-[#0a0a0a] ${
-                landscape
-                  ? "flex max-w-5xl flex-col overflow-y-auto"
-                  : "grid max-w-6xl grid-cols-1 overflow-hidden md:grid-cols-2"
+                selected.stack
+                  ? "flex max-w-3xl flex-col overflow-y-auto"
+                  : landscape
+                    ? "flex max-w-5xl flex-col overflow-y-auto"
+                    : "grid max-w-6xl grid-cols-1 overflow-hidden md:grid-cols-2"
               }`}
               onClick={(e) => e.stopPropagation()}
             >
+              {selected.stack && (
+                <div className="flex shrink-0 flex-col" data-testid="artwork-modal-stack">
+                  {(selected.media && selected.media.length
+                    ? selected.media
+                    : [{ type: "image", url: selected.image, label: "Hero Render" }]
+                  ).map((m, i) =>
+                    m.type === "video" ? (
+                      <video key={i} src={m.url} controls muted loop className="block w-full" data-testid={`stack-video-${i}`} />
+                    ) : m.type === "model" ? (
+                      <div key={i} className="relative h-[70vh]">
+                        <MarmosetViewer url={m.url} />
+                      </div>
+                    ) : (
+                      <StackImage
+                        key={i}
+                        src={m.url}
+                        alt={`${selected.title} — ${m.label}`}
+                        testId={`stack-img-${i}`}
+                      />
+                    )
+                  )}
+                </div>
+              )}
+              {!selected.stack && (
               <div
                 className={`relative overflow-hidden ${landscape ? "h-[42vh] w-full shrink-0 md:h-[60vh]" : "h-[40vh] md:h-[90vh]"}`}
                 onMouseMove={(e) => {
@@ -278,24 +338,25 @@ export default function Gallery({ artworks }) {
                   );
                 })()}
               </div>
-              <div className="flex flex-col justify-between overflow-y-auto p-8 md:p-12">
+              )}
+              <div className={`flex flex-col justify-between ${selected.stack ? "shrink-0 overflow-visible p-10 md:p-16" : "overflow-y-auto p-8 md:p-12"}`}>
                 <div>
-                  <p className="font-code mb-3 text-[11px] uppercase tracking-[0.35em] text-[#00F0FF]">
+                  <p className={`font-code mb-3 uppercase tracking-[0.35em] text-[#00F0FF] ${selected.stack ? "text-xs" : "text-[11px]"}`}>
                     {CATEGORY_LABELS[selected.category] || selected.category} — {selected.year}
                   </p>
-                  <h3 className="font-display text-3xl font-black tracking-tighter md:text-4xl">
+                  <h3 className={`font-display font-black tracking-tighter ${selected.stack ? "text-4xl md:text-6xl" : "text-3xl md:text-4xl"}`}>
                     {selected.title}
                   </h3>
-                  <p className="mt-6 text-sm leading-relaxed text-white/60">
+                  <p className={`leading-relaxed text-white/60 ${selected.stack ? "mt-8 text-base md:text-lg" : "mt-6 text-sm"}`}>
                     {selected.description}
                   </p>
                 </div>
-                <dl className="mt-10 grid grid-cols-2 gap-6 border-t border-white/10 pt-8">
+                <dl className={`grid grid-cols-2 gap-6 border-t border-white/10 ${selected.stack ? "mt-12 pt-10" : "mt-10 pt-8"}`}>
                   <div>
                     <dt className="font-code text-[10px] uppercase tracking-[0.25em] text-white/40">
                       Software
                     </dt>
-                    <dd className="font-code mt-2 text-sm text-white/90">
+                    <dd className={`font-code mt-2 text-white/90 ${selected.stack ? "text-base" : "text-sm"}`}>
                       {selected.software.join(" / ")}
                     </dd>
                   </div>
@@ -303,7 +364,7 @@ export default function Gallery({ artworks }) {
                     <dt className="font-code text-[10px] uppercase tracking-[0.25em] text-white/40">
                       Polycount
                     </dt>
-                    <dd className="font-code mt-2 text-sm text-[#00F0FF]">
+                    <dd className={`font-code mt-2 text-[#00F0FF] ${selected.stack ? "text-base" : "text-sm"}`}>
                       {selected.polycount}
                     </dd>
                   </div>

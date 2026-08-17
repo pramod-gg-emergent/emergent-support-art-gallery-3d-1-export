@@ -270,7 +270,7 @@ def grade_image(data: bytes, ext: str):
         img = img.convert("RGB")
     img = ImageEnhance.Contrast(img).enhance(1.06)
     img = ImageEnhance.Color(img).enhance(1.08)
-    img = ImageEnhance.Sharpness(img).enhance(1.12)
+    img = ImageEnhance.Sharpness(img).enhance(1.35)
     img = ImageEnhance.Brightness(img).enhance(1.02)
     buf = io.BytesIO()
     if ext == "png":

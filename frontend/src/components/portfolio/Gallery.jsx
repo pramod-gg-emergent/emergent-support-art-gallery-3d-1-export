@@ -33,10 +33,13 @@ export default function Gallery({ artworks }) {
   const [selected, setSelected] = useState(null);
   const [activeMedia, setActiveMedia] = useState(0);
   const [landscape, setLandscape] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
 
   useEffect(() => {
     setActiveMedia(0);
     setLandscape(false);
+    setZoomed(false);
   }, [selected]);
 
   const visible =
@@ -160,7 +163,15 @@ export default function Gallery({ artworks }) {
               }`}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className={`relative overflow-hidden ${landscape ? "h-[42vh] w-full shrink-0 md:h-[60vh]" : "h-[40vh] md:h-[90vh]"}`}>
+              <div
+                className={`relative overflow-hidden ${landscape ? "h-[42vh] w-full shrink-0 md:h-[60vh]" : "h-[40vh] md:h-[90vh]"}`}
+                onMouseMove={(e) => {
+                  const r = e.currentTarget.getBoundingClientRect();
+                  setZoomOrigin(
+                    `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`
+                  );
+                }}
+              >
                 {(() => {
                   const media = [
                     { type: "image", url: selected.image, label: "Hero Render" },
@@ -194,16 +205,28 @@ export default function Gallery({ artworks }) {
                               className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl"
                             />
                           )}
-                          <motion.img
-                            layoutId={`art-img-${selected.slug}`}
-                            src={active.url}
-                            alt={`${selected.title} — ${active.label}`}
-                            onLoad={(e) =>
-                              setLandscape(e.target.naturalWidth > e.target.naturalHeight * 0.85)
-                            }
-                            className={`h-full w-full ${landscape ? "relative object-contain" : "object-cover"}`}
-                            data-testid="artwork-modal-image"
-                          />
+                          <div
+                            onClick={() => setZoomed((z) => !z)}
+                            className={`h-full w-full transition-transform duration-300 ease-out ${
+                              zoomed ? "cursor-zoom-out" : "cursor-zoom-in"
+                            }`}
+                            style={{
+                              transform: zoomed ? "scale(2.2)" : "scale(1)",
+                              transformOrigin: zoomOrigin,
+                            }}
+                            data-testid="artwork-modal-zoom"
+                          >
+                            <motion.img
+                              layoutId={`art-img-${selected.slug}`}
+                              src={active.url}
+                              alt={`${selected.title} — ${active.label}`}
+                              onLoad={(e) =>
+                                setLandscape(e.target.naturalWidth > e.target.naturalHeight * 0.85)
+                              }
+                              className={`h-full w-full ${landscape ? "relative object-contain" : "object-cover"}`}
+                              data-testid="artwork-modal-image"
+                            />
+                          </div>
                         </>
                       )}
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent md:bg-gradient-to-r" />
@@ -221,6 +244,7 @@ export default function Gallery({ artworks }) {
                               onClick={() => {
                                 setActiveMedia(i);
                                 setLandscape(m.type !== "image");
+                                setZoomed(false);
                               }}
                               className={`h-14 w-20 shrink-0 overflow-hidden border transition-colors duration-300 ${
                                 i === activeMedia ? "border-[#00F0FF]" : "border-white/20 hover:border-white/60"

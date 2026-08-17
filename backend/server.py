@@ -331,7 +331,7 @@ async def upload_image(file: UploadFile = File(...), user=Depends(get_current_us
     })
     return {"path": result["path"], "url": f"/api/files/{result['path']}", "kind": kind}
 
-@api_router.get("/files/{path:path}")
+@api_router.api_route("/files/{path:path}", methods=["GET", "HEAD"])
 async def serve_file(path: str):
     record = await db.files.find_one({"storage_path": path, "is_deleted": False})
     if not record:
@@ -340,7 +340,11 @@ async def serve_file(path: str):
         data, content_type = get_object(path)
     except Exception:
         raise HTTPException(status_code=404, detail="File not found in storage")
-    return FileResponse(content=data, media_type=record.get("content_type", content_type), headers={"Cache-Control": "no-cache"})
+    return FileResponse(
+        content=data,
+        media_type=record.get("content_type", content_type),
+        headers={"Cache-Control": "public, max-age=300", "Accept-Ranges": "none"},
+    )
 
 async def seed_admin():
     email = os.environ["ADMIN_EMAIL"].lower()

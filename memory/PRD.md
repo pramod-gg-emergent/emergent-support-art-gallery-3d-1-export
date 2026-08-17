@@ -18,6 +18,10 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 21)
+- Error sweep: fixed 405s from Marmoset viewer HEAD/thumb probes (files endpoint now accepts GET+HEAD); backend logs clean; browser console clean (only Cloudflare RUM beacon noise remains, infra-level)
+- File serving polish: Cache-Control public max-age=300 + Accept-Ranges header
+
 ## Implemented (2026-08-17, update 20)
 - Per-artwork "fit whole image" option (fit flag + admin checkbox "Fit whole image in gallery card — no cropping"); enabled for Hulkbuster Armor so the full figure shows uncropped in its card
 

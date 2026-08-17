@@ -24,8 +24,12 @@ export default function Gallery({ artworks }) {
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState(null);
   const [activeMedia, setActiveMedia] = useState(0);
+  const [landscape, setLandscape] = useState(false);
 
-  useEffect(() => setActiveMedia(0), [selected]);
+  useEffect(() => {
+    setActiveMedia(0);
+    setLandscape(false);
+  }, [selected]);
 
   const visible =
     filter === "all"
@@ -132,10 +136,14 @@ export default function Gallery({ artworks }) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 60, opacity: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="grid max-h-[90vh] w-full max-w-6xl grid-cols-1 overflow-hidden border border-white/10 bg-[#0a0a0a] md:grid-cols-2"
+              className={`max-h-[90vh] w-full border border-white/10 bg-[#0a0a0a] ${
+                landscape
+                  ? "flex max-w-5xl flex-col overflow-y-auto"
+                  : "grid max-w-6xl grid-cols-1 overflow-hidden md:grid-cols-2"
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative h-[40vh] md:h-[90vh]">
+              <div className={`relative ${landscape ? "h-[42vh] w-full shrink-0 md:h-[60vh]" : "h-[40vh] md:h-[90vh]"}`}>
                 {(() => {
                   const media = [
                     { type: "image", url: selected.image, label: "Hero Render" },
@@ -164,6 +172,9 @@ export default function Gallery({ artworks }) {
                           layoutId={`art-img-${selected.slug}`}
                           src={active.url}
                           alt={`${selected.title} — ${active.label}`}
+                          onLoad={(e) =>
+                            setLandscape(e.target.naturalWidth > e.target.naturalHeight * 1.15)
+                          }
                           className="h-full w-full object-cover"
                           data-testid="artwork-modal-image"
                         />
@@ -180,7 +191,10 @@ export default function Gallery({ artworks }) {
                           {media.map((m, i) => (
                             <button
                               key={i}
-                              onClick={() => setActiveMedia(i)}
+                              onClick={() => {
+                                setActiveMedia(i);
+                                setLandscape(m.type !== "image");
+                              }}
                               className={`h-14 w-20 shrink-0 overflow-hidden border transition-colors duration-300 ${
                                 i === activeMedia ? "border-[#00F0FF]" : "border-white/20 hover:border-white/60"
                               }`}

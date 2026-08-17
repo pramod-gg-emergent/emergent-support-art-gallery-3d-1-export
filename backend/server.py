@@ -168,7 +168,8 @@ async def root():
 
 @api_router.get("/artworks")
 async def get_artworks():
-    return await db.artworks.find({}, {"_id": 0}).to_list(100)
+    arts = await db.artworks.find({}, {"_id": 0}).to_list(200)
+    return sorted(arts, key=lambda a: a.get("order", 999))
 
 @api_router.get("/artworks/{slug}")
 async def get_artwork(slug: str):
@@ -243,9 +244,19 @@ async def create_artwork(input: ArtworkIn, user=Depends(get_current_user)):
         slug = f"{base}-{n}"
         n += 1
     doc["slug"] = slug
+    doc["order"] = await db.artworks.count_documents({})
     await db.artworks.insert_one(doc)
     doc.pop("_id", None)
     return doc
+
+class ReorderIn(BaseModel):
+    slugs: List[str]
+
+@api_router.post("/artworks/reorder")
+async def reorder_artworks(input: ReorderIn, user=Depends(get_current_user)):
+    for i, slug in enumerate(input.slugs):
+        await db.artworks.update_one({"slug": slug}, {"$set": {"order": i}})
+    return {"ok": True}
 
 @api_router.put("/artworks/{slug}")
 async def update_artwork(slug: str, input: ArtworkIn, user=Depends(get_current_user)):
@@ -349,6 +360,11 @@ async def startup():
     await seed_admin()
     for art in ARTWORKS:
         await db.artworks.update_one({"slug": art["slug"]}, {"$setOnInsert": art}, upsert=True)
+    docs = await db.artworks.find({}).to_list(200)
+    docs.sort(key=lambda d: d.get("order", 999))
+    for i, d in enumerate(docs):
+        if d.get("order") != i:
+            await db.artworks.update_one({"_id": d["_id"]}, {"$set": {"order": i}})
     try:
         init_storage()
         logger.info("Object storage initialized")

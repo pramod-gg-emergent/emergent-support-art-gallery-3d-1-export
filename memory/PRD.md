@@ -18,6 +18,10 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 14)
+- Red "5" overlay mark inpainted off all 4 knife renders (red-dominant corner mask, ~800px) — script /app/scripts/remove_red_mark.py
+- Artwork ordering: order field on artworks, sorted GET, POST /api/artworks/reorder (protected), startup normalizes order; studio rows have up/down arrow controls persisting instantly
+
 ## Implemented (2026-08-17, update 13)
 - Watermark cleaning run on user's Dead Island 2 Knife uploads (5 PNGs cleaned; grey clay render auto-skipped as clean). NOTE: UV map file 0bf1e12a was over-masked (corner UV islands eaten) — user must re-upload it; script now skips bright-heavy maps (>25k px guard)
 - Red "5" mark bottom-right of knife renders intentionally left (unknown branding) — offered removal

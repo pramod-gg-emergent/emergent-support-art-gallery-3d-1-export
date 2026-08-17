@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Pencil, Trash2, Plus, LogOut } from "lucide-react";
+import { Pencil, Trash2, Plus, LogOut, ArrowUp, ArrowDown } from "lucide-react";
 import ArtworkForm from "@/components/admin/ArtworkForm";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -35,6 +35,15 @@ export default function AdminDashboard() {
     if (!window.confirm("Delete this artwork?")) return;
     await axios.delete(`${API}/artworks/${slug}`, { withCredentials: true });
     load();
+  };
+
+  const onMove = async (index, dir) => {
+    const j = index + dir;
+    if (j < 0 || j >= artworks.length) return;
+    const next = [...artworks];
+    [next[index], next[j]] = [next[j], next[index]];
+    setArtworks(next);
+    await axios.post(`${API}/artworks/reorder`, { slugs: next.map((a) => a.slug) }, { withCredentials: true });
   };
 
   const onLogout = async () => {
@@ -98,7 +107,7 @@ export default function AdminDashboard() {
       )}
 
       <div className="flex flex-col divide-y divide-white/10 border border-white/10">
-        {artworks.map((art) => (
+        {artworks.map((art, i) => (
           <div
             key={art.slug}
             className="flex flex-col gap-4 p-4 transition-colors duration-300 hover:bg-white/[0.02] md:flex-row md:items-center"
@@ -112,6 +121,24 @@ export default function AdminDashboard() {
               </p>
             </div>
             <div className="flex gap-3">
+              <button
+                onClick={() => onMove(i, -1)}
+                disabled={i === 0}
+                className="flex h-9 w-9 items-center justify-center border border-white/20 text-white/70 transition-colors duration-300 hover:border-[#00F0FF] hover:text-[#00F0FF] disabled:opacity-25"
+                data-testid={`move-up-${art.slug}`}
+                aria-label={`Move ${art.title} up`}
+              >
+                <ArrowUp size={14} />
+              </button>
+              <button
+                onClick={() => onMove(i, 1)}
+                disabled={i === artworks.length - 1}
+                className="flex h-9 w-9 items-center justify-center border border-white/20 text-white/70 transition-colors duration-300 hover:border-[#00F0FF] hover:text-[#00F0FF] disabled:opacity-25"
+                data-testid={`move-down-${art.slug}`}
+                aria-label={`Move ${art.title} down`}
+              >
+                <ArrowDown size={14} />
+              </button>
               <button
                 onClick={() => setEditing(art)}
                 className="font-code flex items-center gap-2 border border-white/20 px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-white/70 transition-colors duration-300 hover:border-[#00F0FF] hover:text-[#00F0FF]"

@@ -145,7 +145,7 @@ export default function Gallery({ artworks }) {
                   layoutId={`art-img-${art.slug}`}
                   src={art.image}
                   alt={art.title}
-                  className="h-full w-full object-cover"
+                  className={`h-full w-full ${art.fit ? "object-contain p-8" : "object-cover"}`}
                 />
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-100" />

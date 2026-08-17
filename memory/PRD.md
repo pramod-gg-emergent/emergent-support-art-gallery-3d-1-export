@@ -18,6 +18,9 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 20)
+- Per-artwork "fit whole image" option (fit flag + admin checkbox "Fit whole image in gallery card — no cropping"); enabled for Hulkbuster Armor so the full figure shows uncropped in its card
+
 ## Implemented (2026-08-17, update 19)
 - Removed cursor-follow preview popup per user; restored simple hover: card image zooms ~8% via wrapper div (framer-motion owns transform on layoutId imgs, so CSS hover on the img itself was dead — moved zoom to wrapper)
 

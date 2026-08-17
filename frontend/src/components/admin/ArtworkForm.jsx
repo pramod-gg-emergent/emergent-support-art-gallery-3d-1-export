@@ -15,6 +15,7 @@ const EMPTY = {
   polycount: "",
   media: [],
   stack: false,
+  fit: false,
 };
 
 const inputCls =
@@ -30,7 +31,7 @@ const detectType = (url, fallback) =>
 export default function ArtworkForm({ initial, onSave, onCancel }) {
   const [form, setForm] = useState(
     initial
-      ? { ...initial, software: initial.software.join(", "), media: initial.media || [], stack: !!initial.stack }
+      ? { ...initial, software: initial.software.join(", "), media: initial.media || [], stack: !!initial.stack, fit: !!initial.fit }
       : EMPTY
   );
   const [saving, setSaving] = useState(false);
@@ -122,6 +123,7 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
       polycount: form.polycount,
       media,
       stack: !!form.stack,
+      fit: !!form.fit,
     };
     try {
       if (initial) {
@@ -218,6 +220,19 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
         />
         <label htmlFor="stack-toggle" className="font-code text-[10px] uppercase tracking-[0.25em] text-white/60">
           Vertical story layout — stack all images seamlessly like ArtStation
+        </label>
+      </div>
+      <div className="mt-3 flex items-center gap-4 border border-white/10 px-4 py-3">
+        <input
+          id="fit-toggle"
+          type="checkbox"
+          checked={!!form.fit}
+          onChange={(e) => setForm({ ...form, fit: e.target.checked })}
+          className="h-4 w-4 accent-[#00F0FF]"
+          data-testid="form-fit-toggle"
+        />
+        <label htmlFor="fit-toggle" className="font-code text-[10px] uppercase tracking-[0.25em] text-white/60">
+          Fit whole image in gallery card — no cropping
         </label>
       </div>
       <div className="mt-6">

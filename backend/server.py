@@ -231,6 +231,7 @@ class ArtworkIn(BaseModel):
     polycount: str
     media: List[MediaItem] = []
     stack: bool = False
+    fit: bool = False
 
 def slugify(title: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-") or "artwork"

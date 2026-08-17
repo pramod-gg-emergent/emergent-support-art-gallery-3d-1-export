@@ -1,0 +1,121 @@
+{
+  "project_type": "portfolio",
+  "theme": "dark",
+  "archetype": "ELECTRIC & NEON (Future, Speed, Disruption) / AAA Cinematic",
+  "colors": {
+    "background": "#050505",
+    "surface": "#111111",
+    "primary_accent": "#00F0FF",
+    "secondary_accent": "#FF003C",
+    "text_primary": "#FFFFFF",
+    "text_secondary": "rgba(255, 255, 255, 0.6)",
+    "border_subtle": "rgba(255, 255, 255, 0.08)",
+    "neon_glow": "drop-shadow(0 0 10px rgba(0, 240, 255, 0.5))"
+  },
+  "typography": {
+    "heading_font": "Unbounded",
+    "subheading_font": "JetBrains Mono",
+    "body_font": "Manrope",
+    "rules": [
+      "Headlines (Size > 32px) MUST use tight letter spacing (tracking-tighter).",
+      "Overlines / Labels MUST be Uppercase + Tiny + Wide Spacing (tracking-[0.2em]).",
+      "Use JetBrains Mono for numbers, manifesto chapters, poly-counts, stats.",
+      "No Inter, Roboto, or generic sans for headings."
+    ]
+  },
+  "visual_enhancers": {
+    "surface_strategy": "Retro-Futurism / Terminal Look mixed with Cinematic Glass",
+    "borders": "1px solid rgba(255, 255, 255, 0.08) for gallery items. Use 'Tracing Beam' hover effects for active states.",
+    "textures": "Include a subtle noise/grain overlay across the entire site to prevent digital flatness.",
+    "hover_states": "High-contrast neon borders or aggressive text-color shifts (White to Neon Cyan) on hover."
+  },
+  "layouts": {
+    "general": "High density, wide margins. Generous spacing (p-8 to p-16) for breathing room.",
+    "hero": "Full screen (h-screen). Extreme asymmetry. Focus on the kinetic text reveal and background 3D/particle moment.",
+    "gallery": "The 'Tetris' Grid (Mode A). grid-cols-1 md:grid-cols-12 gap-8. Mix spans (col-span-4, col-span-8) to avoid boring identical squares.",
+    "manifesto": "Numbered chapters using massive JetBrains Mono typography. Scroll-triggered fades.",
+    "marquee": "Massive outline text (text-8xl+ font-black text-transparent border-white/20) slow scrolling in the background for high energy.",
+    "footer": "Massive typography 'LET\\'S TALK' at text-[10vw], pure black background, simple email and social links (no forms)."
+  },
+  "components": {
+    "hero_text": "Framer Motion line-by-line masked text reveal. Overflow hidden on parent, translateY on child.",
+    "navigation": "Sticky, glassmorphism (backdrop-blur-xl bg-black/60), pure white text. MUST have Logo + Links + CTA.",
+    "gallery_filters": "JetBrains Mono, uppercase, neon active state underline or glow.",
+    "buttons": "Sharp corners (rounded-none), 1px border. Hover: filled neon background with black text."
+  },
+  "motion": {
+    "scroll": "Lenis MUST be implemented for smooth momentum scrolling.",
+    "reveals": "Framer motion for all entrance animations (y: 40, opacity: 0 to y: 0, opacity: 1).",
+    "micro_interactions": "Hover scaling on gallery images (scale 1.05 with slow transition).",
+    "marquee": "Use react-fast-marquee or framer motion for infinite horizontal scroll."
+  },
+  "accessibility": {
+    "contrast": "Ensure text over neon/dark backgrounds meets 4.5:1 ratio.",
+    "focus": "High contrast cyan outline on focus states.",
+    "testing": "All interactive elements MUST include a data-testid attribute in kebab-case."
+  },
+  "media": {
+    "image_urls": [
+      {
+        "url": "https://images.unsplash.com/photo-1750096319146-6310519b5af2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAxODF8MHwxfHNlYXJjaHwzfHxjeWJlcnB1bmslMjAzZCUyMGNoYXJhY3RlciUyMHBvcnRyYWl0fGVufDB8fHx8MTc4Njk0NjkxMnww&ixlib=rb-4.1.0&q=85",
+        "category": "Characters",
+        "description": "Glowing digital face character portrait"
+      },
+      {
+        "url": "https://images.pexels.com/photos/20434858/pexels-photo-20434858.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "category": "Characters",
+        "description": "Silver suit neon female portrait"
+      },
+      {
+        "url": "https://images.pexels.com/photos/18337644/pexels-photo-18337644.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "category": "Environments",
+        "description": "Neon abstract digital space"
+      },
+      {
+        "url": "https://images.pexels.com/photos/7671959/pexels-photo-7671959.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "category": "Environments",
+        "description": "Sci-fi control panel abstract design"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1688288822105-1dc8fdf9a07e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHwzfHwzZCUyMHNjaS1maSUyMHdlYXBvbiUyMHByb3B8ZW58MHx8fHwxNzg2OTQ2OTEyfDA&ixlib=rb-4.1.0&q=85",
+        "category": "Props",
+        "description": "Sci-fi toy gun weapon"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1588425090516-b339647f1fec?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHwyfHwzZCUyMHNjaS1maSUyMHdlYXBvbiUyMHByb3B8ZW58MHx8fHwxNzg2OTQ2OTEyfDA&ixlib=rb-4.1.0&q=85",
+        "category": "Props",
+        "description": "Rifle weapon on concrete"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1634585738250-09ee92cae0f8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjV8MHwxfHNlYXJjaHw0fHwzZCUyMHNjaS1maSUyMHdlYXBvbiUyMHByb3B8ZW58MHx8fHwxNzg2OTQ2OTEyfDA&ixlib=rb-4.1.0&q=85",
+        "category": "Props",
+        "description": "Sci-fi grid props abstract"
+      }
+    ],
+    "hero_overlay": "bg-black/40 with subtle linear gradient to pure black at the bottom. Never use generic flat blanket overlays."
+  },
+  "3d_libraries": {
+    "recommendation": "tsparticles or react-spring-parallax",
+    "justification": "Provides a subtle 3D parallax hero moment (e.g., floating digital embers or depth-based mouse movement) without the performance overhead of full WebGL, maintaining a cinematic feel.",
+    "usage": "Use as a background layer in the hero section, underneath the kinetic text reveal."
+  },
+  "instructions_to_main_agent": [
+    "This is a dark, cinematic AAA sci-fi portfolio. Embrace pure #050505 backgrounds and neon accents.",
+    "DO NOT use generic centered layouts. Use aggressive asymmetry.",
+    "Implement Lenis for momentum scrolling across the entire application.",
+    "Use Framer Motion to create the 'Kinetic Masked Text Reveal' in the hero. This means text lines translate up from outside a hidden overflow container.",
+    "Gallery MUST be filterable (Characters, Environments, Props) without navigating away. Clicking an item opens the Detail View (could be a full-screen Framer Motion shared layout transition or a separate route).",
+    "In the About/Manifesto section, use large numbered chapters (01, 02, 03) in JetBrains Mono.",
+    "The Contact footer should not have a form. Use a massive 'LET'S TALK' heading with email and social links.",
+    "Add 'data-testid' to all interactive elements for robust testing."
+  ],
+  "universal_guidelines_for_main_agent": [
+    "Use JS (.js/.jsx) not TSX.",
+    "DO NOT apply universal transition (e.g., 'transition: all'). Target specific properties.",
+    "DO NOT center align the main App container. No '.App { text-align: center; }'.",
+    "Never use AI assistant emojis (🤖, etc.). Use Phosphor Icons or Lucide.",
+    "Create depth through layered z-index hierarchy and glassmorphism (12-24px blur + saturate).",
+    "DO NOT use completely transparent backgrounds in headers/overlays if there's content underneath. Use black/60 with blur.",
+    "Never use placeholder image URLs. Rely on the provided media image URLs."
+  ]
+}

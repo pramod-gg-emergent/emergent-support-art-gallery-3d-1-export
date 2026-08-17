@@ -52,7 +52,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#050505] px-6 py-10 md:px-12" data-testid="admin-dashboard">
-      <div className="noise-overlay" aria-hidden="true" />
       <header className="mb-12 flex flex-col justify-between gap-6 border-b border-white/10 pb-8 md:flex-row md:items-center">
         <div>
           <p className="font-code mb-2 text-[11px] uppercase tracking-[0.35em] text-[#00F0FF]">

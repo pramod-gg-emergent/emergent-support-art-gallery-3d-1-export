@@ -44,7 +44,6 @@ function Portfolio() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-white" data-testid="portfolio-app">
-      <div className="noise-overlay" aria-hidden="true" />
       <Nav />
       <main>
         <Hero />

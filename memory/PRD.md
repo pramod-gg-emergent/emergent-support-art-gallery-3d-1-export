@@ -18,6 +18,9 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 10)
+- Film-grain noise overlay removed entirely (main site + admin pages) for a clean look
+
 ## Implemented (2026-08-17, update 9)
 - Zoom bug fix: transform-origin no longer chases cursor (image used to fly out of frame). New anchored pan — zoom centers on clicked point, mouse movement glides across the image with clamped edges so it can never leave the frame
 

@@ -36,7 +36,6 @@ export default function AdminLogin() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#050505] px-6" data-testid="admin-login-page">
-      <div className="noise-overlay" aria-hidden="true" />
       <motion.form
         onSubmit={onSubmit}
         initial={{ opacity: 0, y: 40 }}

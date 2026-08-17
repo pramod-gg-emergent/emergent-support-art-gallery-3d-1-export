@@ -60,9 +60,18 @@ export default function Footer() {
         <p className="font-code text-[10px] uppercase tracking-[0.25em] text-white/30">
           © 2026 Kai Voss — All renders are personal work
         </p>
-        <p className="font-code text-[10px] uppercase tracking-[0.25em] text-white/30">
-          Built with polygons & caffeine
-        </p>
+        <div className="flex items-center gap-8">
+          <p className="font-code text-[10px] uppercase tracking-[0.25em] text-white/30">
+            Built with polygons & caffeine
+          </p>
+          <a
+            href="/admin"
+            className="font-code text-[10px] uppercase tracking-[0.25em] text-white/30 transition-colors duration-300 hover:text-[#00F0FF]"
+            data-testid="footer-studio-link"
+          >
+            Studio
+          </a>
+        </div>
       </div>
     </footer>
   );

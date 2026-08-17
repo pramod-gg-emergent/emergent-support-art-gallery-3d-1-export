@@ -219,6 +219,7 @@ class MediaItem(BaseModel):
     type: Literal["image", "video", "model"]
     url: str
     label: str = ""
+    stacked: bool = False
 
 class ArtworkIn(BaseModel):
     title: str

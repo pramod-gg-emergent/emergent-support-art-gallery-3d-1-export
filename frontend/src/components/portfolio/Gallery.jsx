@@ -202,25 +202,56 @@ export default function Gallery({ artworks }) {
             >
               {selected.stack && (
                 <div className="flex shrink-0 flex-col" data-testid="artwork-modal-stack">
-                  {(selected.media && selected.media.length
-                    ? selected.media
-                    : [{ type: "image", url: selected.image, label: "Hero Render" }]
-                  ).map((m, i) =>
-                    m.type === "video" ? (
-                      <video key={i} src={m.url} controls muted loop className="block w-full" data-testid={`stack-video-${i}`} />
-                    ) : m.type === "model" ? (
-                      <div key={i} className="relative h-[70vh]">
-                        <MarmosetViewer url={m.url} />
-                      </div>
-                    ) : (
-                      <StackImage
-                        key={i}
-                        src={m.url}
-                        alt={`${selected.title} — ${m.label}`}
-                        testId={`stack-img-${i}`}
-                      />
-                    )
-                  )}
+                  {(() => {
+                    const all =
+                      selected.media && selected.media.length
+                        ? selected.media
+                        : [{ type: "image", url: selected.image, label: "Hero Render", stacked: true }];
+                    const stackedItems = all.filter((m) => m.stacked);
+                    const column = stackedItems.length ? stackedItems : all;
+                    const extra = stackedItems.length ? all.filter((m) => !m.stacked) : [];
+                    return (
+                      <>
+                        {column.map((m, i) =>
+                          m.type === "video" ? (
+                            <video key={i} src={m.url} controls muted loop className="block w-full" data-testid={`stack-video-${i}`} />
+                          ) : m.type === "model" ? (
+                            <div key={i} className="relative h-[70vh]">
+                              <MarmosetViewer url={m.url} />
+                            </div>
+                          ) : (
+                            <img
+                              key={i}
+                              src={m.url}
+                              alt={`${selected.title} — ${m.label}`}
+                              className="block w-full"
+                              data-testid={`stack-img-${i}`}
+                            />
+                          )
+                        )}
+                        {extra.length > 0 && (
+                          <div className="flex flex-col gap-10 border-t border-white/10 px-6 py-10 md:px-10" data-testid="artwork-modal-extra">
+                            {extra.map((m, i) => (
+                              <div key={i}>
+                                <p className="font-code mb-3 text-[10px] uppercase tracking-[0.3em] text-[#00F0FF]">
+                                  {m.label || "Render"}
+                                </p>
+                                {m.type === "video" ? (
+                                  <video src={m.url} controls muted loop className="block w-full" data-testid={`extra-video-${i}`} />
+                                ) : m.type === "model" ? (
+                                  <div className="relative h-[60vh]">
+                                    <MarmosetViewer url={m.url} />
+                                  </div>
+                                ) : (
+                                  <StackImage src={m.url} alt={`${selected.title} — ${m.label}`} testId={`extra-img-${i}`} />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
                 </div>
               )}
               {!selected.stack && (

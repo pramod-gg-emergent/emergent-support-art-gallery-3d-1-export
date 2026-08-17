@@ -274,6 +274,19 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
               </button>
               <button
                 type="button"
+                onClick={() => setMedia(i, { stacked: !m.stacked })}
+                title="Include in vertical composition"
+                className={`font-code border px-2 py-2 text-[9px] uppercase tracking-[0.15em] transition-colors duration-300 ${
+                  m.stacked
+                    ? "border-[#00F0FF] text-[#00F0FF]"
+                    : "border-white/20 text-white/50 hover:text-white"
+                }`}
+                data-testid={`media-stack-${i}`}
+              >
+                Vert
+              </button>
+              <button
+                type="button"
                 onClick={() => mediaRefs.current[i]?.click()}
                 disabled={mediaUploading === i}
                 className="font-code border border-white/20 px-3 py-2 text-[10px] uppercase tracking-[0.2em] text-white/70 transition-colors duration-300 hover:border-[#00F0FF] hover:text-[#00F0FF] disabled:opacity-40"

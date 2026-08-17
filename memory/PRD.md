@@ -18,6 +18,9 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 16)
+- Hybrid vertical-story mode: per-media "stacked" flag (Vert toggle in admin form). In stack view, flagged images form the seamless vertical composition; other media appear below in a labeled section with zoom/3D support. Bloody Bat configured: Barrel/Body/Grip = composition, rest = extras
+
 ## Implemented (2026-08-17, update 15)
 - Bloody Bat expanded: 3 new renders (watermark-cleaned; Angle 03 restored from original and re-cleaned with sticker-safe white-cluster mask after first pass nicked the zombie sticker), texture maps sheet, and real BaseballView.mview 3D model. Stack mode turned off per user (now standard viewer with 9 thumbnails)
 - Media reorder: up/down arrows on each media row in the admin form

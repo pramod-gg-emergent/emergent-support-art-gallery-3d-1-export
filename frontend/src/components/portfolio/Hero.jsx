@@ -16,7 +16,6 @@ const LINES = [
 const STATS = [
   { value: "03+", label: "Years in games" },
   { value: "50+", label: "Assets shipped" },
-  { value: "2D×3D", label: "Disciplines" },
 ];
 
 const HERO_IMG =
@@ -114,7 +113,7 @@ export default function Hero() {
             className="font-code mb-6 text-[11px] uppercase tracking-[0.35em] text-[#00F0FF]"
             data-testid="hero-overline"
           >
-            Aman Deep — 3D/2D Game Artist / Portfolio 2026
+            Aman Deep — 3D Game Artist / Portfolio 2026
           </motion.p>
         </div>
         <h1

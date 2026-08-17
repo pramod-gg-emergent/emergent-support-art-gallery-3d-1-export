@@ -19,7 +19,7 @@ function Portfolio() {
   const [artworks, setArtworks] = useState([]);
 
   useEffect(() => {
-    document.title = "KAI VOSS — 3D Game Artist";
+    document.title = "AMAN DEEP — 3D Game Artist";
     const lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 1 });
     window.__lenis = lenis;
     let frame;

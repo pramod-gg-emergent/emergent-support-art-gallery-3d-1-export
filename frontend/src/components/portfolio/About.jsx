@@ -12,7 +12,7 @@ const TOOLS = [
 ];
 
 const PORTRAIT =
-  "https://images.pexels.com/photos/20434858/pexels-photo-20434858.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940";
+  "https://images.unsplash.com/photo-1750096319146-6310519b5af2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAxODF8MHwxfHNlYXJjaHwzfHxjeWJlcnB1bmslMjAzZCUyMGNoYXJhY3RlciUyMHBvcnRyYWl0fGVufDB8fHx8MTc4Njk0NjkxMnww&ixlib=rb-4.1.0&q=85";
 
 export default function About() {
   return (
@@ -39,12 +39,12 @@ export default function About() {
             <div className="relative overflow-hidden border border-white/10">
               <img
                 src={PORTRAIT}
-                alt="Kai Voss studio portrait"
+                alt="Aman Deep — featured artwork"
                 className="h-[60vh] w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#050505]/80 via-transparent to-transparent" />
               <p className="font-code absolute bottom-4 left-4 text-[10px] uppercase tracking-[0.3em] text-white/70">
-                Kai Voss — Berlin, DE
+                Aman Deep — 3D/2D Game Artist
               </p>
             </div>
           </motion.div>
@@ -58,14 +58,15 @@ export default function About() {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
             <p className="max-w-xl text-lg leading-relaxed text-white/80 md:text-xl">
-              I'm Kai — a 3D game artist with seven years across AAA and indie
-              production. I take assets from blockout to engine-ready: high-poly
-              sculpts, clean topology, PBR texturing and cinematic presentation.
+              I'm Aman — a 3D/2D game artist with 3+ years of professional
+              experience at Supranic Games. I take assets from blockout to
+              engine-ready: high-poly sculpts, clean topology, PBR texturing
+              and cinematic presentation.
             </p>
             <p className="mt-6 max-w-xl text-sm leading-relaxed text-white/50">
-              Previously at Neonforge Studios and Helix Interactive. Currently
-              open for freelance character, environment and hard-surface prop
-              work, and select full-time opportunities.
+              50+ assets shipped across production. Currently open for
+              freelance character, environment and hard-surface prop work, and
+              select full-time opportunities.
             </p>
           </motion.div>
 

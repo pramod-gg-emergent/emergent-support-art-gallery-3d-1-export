@@ -310,7 +310,7 @@ async def seed_admin():
         await db.users.insert_one({
             "email": email,
             "password_hash": hash_password(password),
-            "name": "Kai Voss",
+            "name": "Aman Deep",
             "role": "admin",
             "created_at": datetime.now(timezone.utc),
         })

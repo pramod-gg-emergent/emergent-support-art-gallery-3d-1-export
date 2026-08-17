@@ -32,7 +32,7 @@ export default function Nav() {
             AD<span className="text-[#00F0FF]">.</span>
           </span>
           <span className="font-code hidden text-[10px] uppercase tracking-[0.3em] text-white/50 sm:block">
-            Kai Voss
+            Aman Deep
           </span>
         </button>
         <nav className="flex items-center gap-6 md:gap-10">
@@ -47,7 +47,7 @@ export default function Nav() {
             </button>
           ))}
           <a
-            href="mailto:hello@kaivoss.art"
+            href="mailto:deep.escape21@gmail.com"
             className="font-code hidden border border-[#00F0FF]/60 px-5 py-2 text-[11px] uppercase tracking-[0.25em] text-[#00F0FF] transition-colors duration-300 hover:bg-[#00F0FF] hover:text-black md:block"
             data-testid="nav-hire-button"
           >

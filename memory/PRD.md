@@ -18,6 +18,12 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 5)
+- Full rebrand to real identity: Aman Deep, "AD." logo, 3D/2D Game Artist at Supranic Games, stats 03+ years / 50+ assets / 2D×3D
+- Real links: ArtStation artstation.com/ad0021, Instagram ad_mehta21, email deep.escape21@gmail.com (footer + Hire Me)
+- Admin login email changed to deep.escape21@gmail.com (password unchanged)
+- Tab title/description updated; artwork images and descriptions remain placeholder stock content
+
 ## Implemented (2026-08-17, update 4)
 - Adaptive artwork detail layout: landscape renders (>1.15 aspect), videos and 3D scenes open stacked full-width (media top, info below); portrait images keep the side-by-side split. Orientation detected from image natural dimensions.
 

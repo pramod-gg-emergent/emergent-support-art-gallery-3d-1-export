@@ -2,10 +2,8 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
 const SOCIALS = [
-  { label: "ArtStation", href: "https://artstation.com", testId: "social-artstation" },
-  { label: "Instagram", href: "https://instagram.com", testId: "social-instagram" },
-  { label: "X / Twitter", href: "https://x.com", testId: "social-twitter" },
-  { label: "Discord", href: "https://discord.com", testId: "social-discord" },
+  { label: "ArtStation", href: "https://www.artstation.com/ad0021", testId: "social-artstation" },
+  { label: "Instagram", href: "https://instagram.com/ad_mehta21", testId: "social-instagram" },
 ];
 
 export default function Footer() {
@@ -30,11 +28,11 @@ export default function Footer() {
 
       <div className="mt-16 flex flex-col justify-between gap-10 border-t border-white/10 pt-10 md:flex-row md:items-center">
         <a
-          href="mailto:hello@kaivoss.art"
+          href="mailto:deep.escape21@gmail.com"
           className="group font-code flex items-center gap-3 text-lg text-white transition-colors duration-300 hover:text-[#00F0FF] md:text-2xl"
           data-testid="footer-email-link"
         >
-          hello@kaivoss.art
+          deep.escape21@gmail.com
           <ArrowUpRight
             size={22}
             className="transition-transform duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
@@ -58,7 +56,7 @@ export default function Footer() {
 
       <div className="mt-16 flex flex-col justify-between gap-4 md:flex-row">
         <p className="font-code text-[10px] uppercase tracking-[0.25em] text-white/30">
-          © 2026 Kai Voss — All renders are personal work
+          © 2026 Aman Deep — All renders are personal work
         </p>
         <div className="flex items-center gap-8">
           <p className="font-code text-[10px] uppercase tracking-[0.25em] text-white/30">

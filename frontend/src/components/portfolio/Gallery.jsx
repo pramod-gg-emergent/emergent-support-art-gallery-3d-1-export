@@ -8,7 +8,15 @@ const FILTERS = [
   { key: "characters", label: "Characters" },
   { key: "environments", label: "Environments" },
   { key: "props", label: "Props" },
+  { key: "low-poly", label: "Low Poly" },
 ];
+
+const CATEGORY_LABELS = {
+  characters: "Characters",
+  environments: "Environments",
+  props: "Props",
+  "low-poly": "Low Poly",
+};
 
 const SPANS = [
   "md:col-span-8 md:h-[62vh]",
@@ -105,7 +113,7 @@ export default function Gallery({ artworks }) {
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6">
                 <div>
                   <p className="font-code mb-2 text-[10px] uppercase tracking-[0.3em] text-[#00F0FF]">
-                    {art.category} / {art.year}
+                    {CATEGORY_LABELS[art.category] || art.category} / {art.year}
                   </p>
                   <h3 className="font-display text-xl font-bold tracking-tight md:text-2xl">
                     {art.title}
@@ -120,6 +128,15 @@ export default function Gallery({ artworks }) {
           ))}
         </AnimatePresence>
       </motion.div>
+
+      {visible.length === 0 && (
+        <p
+          className="font-code border border-dashed border-white/15 px-6 py-16 text-center text-[11px] uppercase tracking-[0.3em] text-white/40"
+          data-testid="gallery-empty"
+        >
+          Stylized low poly pieces dropping soon — check back
+        </p>
+      )}
 
       <AnimatePresence>
         {selected && (
@@ -223,7 +240,7 @@ export default function Gallery({ artworks }) {
               <div className="flex flex-col justify-between overflow-y-auto p-8 md:p-12">
                 <div>
                   <p className="font-code mb-3 text-[11px] uppercase tracking-[0.35em] text-[#00F0FF]">
-                    {selected.category} — {selected.year}
+                    {CATEGORY_LABELS[selected.category] || selected.category} — {selected.year}
                   </p>
                   <h3 className="font-display text-3xl font-black tracking-tighter md:text-4xl">
                     {selected.title}

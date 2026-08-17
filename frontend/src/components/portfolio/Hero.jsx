@@ -16,6 +16,7 @@ const LINES = [
 const STATS = [
   { value: "03+", label: "Years in games" },
   { value: "50+", label: "Assets shipped" },
+  { value: "3D", label: "Only discipline" },
 ];
 
 const HERO_IMG =

@@ -18,6 +18,10 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 6)
+- New "low-poly" (Stylized Low Poly) category end-to-end: backend model, gallery filter with neon active state, labeled cards/modal, admin form option, styled empty state until real pieces are added
+- About aligned to 3D-only; hero third stat restored as "3D / Only discipline"
+
 ## Implemented (2026-08-17, update 5)
 - Full rebrand to real identity: Aman Deep, "AD." logo, 3D/2D Game Artist at Supranic Games, stats 03+ years / 50+ assets / 2D×3D
 - Real links: ArtStation artstation.com/ad0021, Instagram ad_mehta21, email deep.escape21@gmail.com (footer + Hire Me)

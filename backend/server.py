@@ -219,7 +219,7 @@ class MediaItem(BaseModel):
 
 class ArtworkIn(BaseModel):
     title: str
-    category: Literal["characters", "environments", "props"]
+    category: Literal["characters", "environments", "props", "low-poly"]
     year: int
     image: str
     description: str

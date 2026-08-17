@@ -150,6 +150,7 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
             <option value="characters">Characters</option>
             <option value="environments">Environments</option>
             <option value="props">Props</option>
+            <option value="low-poly">Stylized Low Poly</option>
           </select>
         </div>
         <div>

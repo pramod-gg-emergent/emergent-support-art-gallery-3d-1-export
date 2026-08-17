@@ -44,7 +44,7 @@ export default function About() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#050505]/80 via-transparent to-transparent" />
               <p className="font-code absolute bottom-4 left-4 text-[10px] uppercase tracking-[0.3em] text-white/70">
-                Aman Deep — 3D/2D Game Artist
+                Aman Deep — 3D Game Artist
               </p>
             </div>
           </motion.div>
@@ -58,7 +58,7 @@ export default function About() {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
             <p className="max-w-xl text-lg leading-relaxed text-white/80 md:text-xl">
-              I'm Aman — a 3D/2D game artist with 3+ years of professional
+              I'm Aman — a 3D game artist with 3+ years of professional
               experience at Supranic Games. I take assets from blockout to
               engine-ready: high-poly sculpts, clean topology, PBR texturing
               and cinematic presentation.

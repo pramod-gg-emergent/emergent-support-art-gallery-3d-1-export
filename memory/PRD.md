@@ -18,6 +18,9 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 11)
+- First real artwork published: BLOODY BAT (props, 2025) with 3 user renders — hero + "Barbed Wire Detail" + "Grip Detail", graded and served from object storage
+
 ## Implemented (2026-08-17, update 10)
 - Film-grain noise overlay removed entirely (main site + admin pages) for a clean look
 

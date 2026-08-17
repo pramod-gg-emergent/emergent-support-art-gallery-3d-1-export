@@ -18,6 +18,9 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 19)
+- Removed cursor-follow preview popup per user; restored simple hover: card image zooms ~8% via wrapper div (framer-motion owns transform on layoutId imgs, so CSS hover on the img itself was dead — moved zoom to wrapper)
+
 ## Implemented (2026-08-17, update 18)
 - Cursor-following hover preview popup in the Archive: mini artwork thumbnail + title + VIEW chip springs along with the cursor across cards (desktop only)
 - Image performance overhaul: uploads now capped at 2560px and re-encoded WebP q88 (PNG kept only for real alpha); one-off optimizer compressed all existing 4K/8K uploads (8–28MB → 200–700KB); fixed modal black-box slow loading

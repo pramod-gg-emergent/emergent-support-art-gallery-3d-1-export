@@ -18,6 +18,9 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 9)
+- Zoom bug fix: transform-origin no longer chases cursor (image used to fly out of frame). New anchored pan — zoom centers on clicked point, mouse movement glides across the image with clamped edges so it can never leave the frame
+
 ## Implemented (2026-08-17, update 8)
 - Click-to-zoom in artwork viewer: 2.2x zoom following the cursor (transform-origin tracks mouse), click again to zoom out; resets when switching media/artwork
 - Upload grade sharpness increased 1.12 → 1.35

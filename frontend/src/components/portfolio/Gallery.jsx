@@ -34,7 +34,8 @@ export default function Gallery({ artworks }) {
   const [activeMedia, setActiveMedia] = useState(0);
   const [landscape, setLandscape] = useState(false);
   const [zoomed, setZoomed] = useState(false);
-  const [zoomOrigin, setZoomOrigin] = useState("50% 50%");
+  const [pan, setPan] = useState({ tx: 0, ty: 0 });
+  const ZOOM = 2.2;
 
   useEffect(() => {
     setActiveMedia(0);
@@ -167,9 +168,13 @@ export default function Gallery({ artworks }) {
                 className={`relative overflow-hidden ${landscape ? "h-[42vh] w-full shrink-0 md:h-[60vh]" : "h-[40vh] md:h-[90vh]"}`}
                 onMouseMove={(e) => {
                   const r = e.currentTarget.getBoundingClientRect();
-                  setZoomOrigin(
-                    `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`
-                  );
+                  const fx = (e.clientX - r.left) / r.width;
+                  const fy = (e.clientY - r.top) / r.height;
+                  const clamp = (v, min) => Math.min(0, Math.max(min, v));
+                  setPan({
+                    tx: clamp(r.width / 2 - ZOOM * fx * r.width, r.width * (1 - ZOOM)),
+                    ty: clamp(r.height / 2 - ZOOM * fy * r.height, r.height * (1 - ZOOM)),
+                  });
                 }}
               >
                 {(() => {
@@ -211,8 +216,10 @@ export default function Gallery({ artworks }) {
                               zoomed ? "cursor-zoom-out" : "cursor-zoom-in"
                             }`}
                             style={{
-                              transform: zoomed ? "scale(2.2)" : "scale(1)",
-                              transformOrigin: zoomOrigin,
+                              transform: zoomed
+                                ? `translate(${pan.tx}px, ${pan.ty}px) scale(${ZOOM})`
+                                : "scale(1)",
+                              transformOrigin: "0 0",
                             }}
                             data-testid="artwork-modal-zoom"
                           >

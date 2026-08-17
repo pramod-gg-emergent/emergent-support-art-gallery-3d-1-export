@@ -22,6 +22,9 @@ const SPANS = [
 export default function Gallery({ artworks }) {
   const [filter, setFilter] = useState("all");
   const [selected, setSelected] = useState(null);
+  const [activeMedia, setActiveMedia] = useState(0);
+
+  useEffect(() => setActiveMedia(0), [selected]);
 
   const visible =
     filter === "all"
@@ -132,13 +135,68 @@ export default function Gallery({ artworks }) {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="relative h-[40vh] md:h-[90vh]">
-                <motion.img
-                  layoutId={`art-img-${selected.slug}`}
-                  src={selected.image}
-                  alt={selected.title}
-                  className="h-full w-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent md:bg-gradient-to-r" />
+                {(() => {
+                  const media = [
+                    { type: "image", url: selected.image, label: "Hero Render" },
+                    ...(selected.media || []),
+                  ];
+                  const active = media[Math.min(activeMedia, media.length - 1)];
+                  const isVideo = active.type === "video";
+                  return (
+                    <>
+                      {isVideo ? (
+                        <video
+                          key={active.url}
+                          src={active.url}
+                          controls
+                          autoPlay
+                          muted
+                          loop
+                          className="h-full w-full object-cover"
+                          data-testid="artwork-modal-video"
+                        />
+                      ) : (
+                        <motion.img
+                          layoutId={`art-img-${selected.slug}`}
+                          src={active.url}
+                          alt={`${selected.title} — ${active.label}`}
+                          className="h-full w-full object-cover"
+                          data-testid="artwork-modal-image"
+                        />
+                      )}
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent md:bg-gradient-to-r" />
+                      <span
+                        className="font-code absolute left-4 top-4 border border-[#00F0FF]/50 bg-black/70 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-[#00F0FF]"
+                        data-testid="artwork-modal-media-label"
+                      >
+                        {active.label || "Render"}
+                      </span>
+                      {media.length > 1 && (
+                        <div className="absolute inset-x-4 bottom-4 flex gap-2 overflow-x-auto" data-testid="artwork-modal-thumbs">
+                          {media.map((m, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setActiveMedia(i)}
+                              className={`h-14 w-20 shrink-0 overflow-hidden border transition-colors duration-300 ${
+                                i === activeMedia ? "border-[#00F0FF]" : "border-white/20 hover:border-white/60"
+                              }`}
+                              data-testid={`media-thumb-${i}`}
+                              aria-label={`Show ${m.label || `media ${i + 1}`}`}
+                            >
+                              {m.type === "video" ? (
+                                <span className="font-code flex h-full w-full items-center justify-center bg-black text-[9px] uppercase tracking-[0.15em] text-[#00F0FF]">
+                                  Video
+                                </span>
+                              ) : (
+                                <img src={m.url} alt={m.label} className="h-full w-full object-cover" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
               <div className="flex flex-col justify-between overflow-y-auto p-8 md:p-12">
                 <div>

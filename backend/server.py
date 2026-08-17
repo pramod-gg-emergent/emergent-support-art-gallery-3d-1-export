@@ -212,6 +212,11 @@ async def logout(response: Response):
     response.delete_cookie("access_token", path="/")
     return {"ok": True}
 
+class MediaItem(BaseModel):
+    type: Literal["image", "video"]
+    url: str
+    label: str = ""
+
 class ArtworkIn(BaseModel):
     title: str
     category: Literal["characters", "environments", "props"]
@@ -220,6 +225,7 @@ class ArtworkIn(BaseModel):
     description: str
     software: List[str]
     polycount: str
+    media: List[MediaItem] = []
 
 def slugify(title: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-") or "artwork"
@@ -257,27 +263,31 @@ async def delete_artwork(slug: str, user=Depends(get_current_user)):
     return {"ok": True}
 
 ALLOWED_IMAGE_EXTS = {"jpg", "jpeg", "png", "webp", "gif"}
+ALLOWED_VIDEO_EXTS = {"mp4", "webm", "mov"}
 
 @api_router.post("/upload", status_code=201)
 async def upload_image(file: UploadFile = File(...), user=Depends(get_current_user)):
     ext = file.filename.split(".")[-1].lower() if "." in file.filename else ""
-    if ext not in ALLOWED_IMAGE_EXTS:
-        raise HTTPException(status_code=400, detail="Only jpg, png, webp or gif images are allowed")
+    if ext not in ALLOWED_IMAGE_EXTS | ALLOWED_VIDEO_EXTS:
+        raise HTTPException(status_code=400, detail="Only images (jpg, png, webp, gif) or videos (mp4, webm, mov) are allowed")
+    kind = "video" if ext in ALLOWED_VIDEO_EXTS else "image"
     data = await file.read()
-    if len(data) > 15 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="Image must be under 15MB")
+    limit = 150 * 1024 * 1024 if kind == "video" else 15 * 1024 * 1024
+    if len(data) > limit:
+        raise HTTPException(status_code=400, detail="Images must be under 15MB, videos under 150MB")
+    content_type = file.content_type or ("video/mp4" if kind == "video" else "image/jpeg")
     path = f"{APP_NAME}/uploads/{uuid.uuid4()}.{ext}"
-    result = put_object(path, data, file.content_type or "image/jpeg")
+    result = put_object(path, data, content_type)
     await db.files.insert_one({
         "id": str(uuid.uuid4()),
         "storage_path": result["path"],
         "original_filename": file.filename,
-        "content_type": file.content_type or "image/jpeg",
+        "content_type": content_type,
         "size": result.get("size", len(data)),
         "is_deleted": False,
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
-    return {"path": result["path"], "url": f"/api/files/{result['path']}"}
+    return {"path": result["path"], "url": f"/api/files/{result['path']}", "kind": kind}
 
 @api_router.get("/files/{path:path}")
 async def serve_file(path: str):

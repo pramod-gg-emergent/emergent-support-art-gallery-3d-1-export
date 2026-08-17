@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import axios from "axios";
+import { X } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const BACKEND = process.env.REACT_APP_BACKEND_URL;
@@ -12,24 +13,42 @@ const EMPTY = {
   description: "",
   software: "",
   polycount: "",
+  media: [],
 };
 
 const inputCls =
   "w-full border border-white/15 bg-black px-4 py-3 text-sm text-white outline-none transition-colors duration-300 focus:border-[#00F0FF]";
 const labelCls = "font-code mb-2 block text-[10px] uppercase tracking-[0.25em] text-white/50";
 
+const VIDEO_RE = /\.(mp4|webm|mov)(\?|$)/i;
+
 export default function ArtworkForm({ initial, onSave, onCancel }) {
   const [form, setForm] = useState(
     initial
-      ? { ...initial, software: initial.software.join(", ") }
+      ? { ...initial, software: initial.software.join(", "), media: initial.media || [] }
       : EMPTY
   );
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [mediaUploading, setMediaUploading] = useState(-1);
   const [error, setError] = useState("");
   const fileRef = useRef(null);
+  const mediaRefs = useRef([]);
 
   const set = (key) => (e) => setForm({ ...form, [key]: e.target.value });
+  const setMedia = (i, patch) =>
+    setForm((f) => ({ ...f, media: f.media.map((m, idx) => (idx === i ? { ...m, ...patch } : m)) }));
+  const addMedia = () =>
+    setForm((f) => ({ ...f, media: [...f.media, { type: "image", url: "", label: "" }] }));
+  const removeMedia = (i) =>
+    setForm((f) => ({ ...f, media: f.media.filter((_, idx) => idx !== i) }));
+
+  const uploadFile = async (file) => {
+    const data = new FormData();
+    data.append("file", file);
+    const res = await axios.post(`${API}/upload`, data, { withCredentials: true });
+    return res.data;
+  };
 
   const onUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -37,10 +56,12 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
     setUploading(true);
     setError("");
     try {
-      const data = new FormData();
-      data.append("file", file);
-      const res = await axios.post(`${API}/upload`, data, { withCredentials: true });
-      setForm((f) => ({ ...f, image: res.data.url }));
+      const r = await uploadFile(file);
+      if (r.kind === "video") {
+        setError("Cover must be an image — add videos under Extra Media");
+      } else {
+        setForm((f) => ({ ...f, image: r.url }));
+      }
     } catch (err) {
       setError(err.response?.data?.detail || "Upload failed");
     } finally {
@@ -48,10 +69,32 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
     }
   };
 
+  const onMediaUpload = async (i, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setMediaUploading(i);
+    setError("");
+    try {
+      const r = await uploadFile(file);
+      setMedia(i, { url: r.url, type: r.kind });
+    } catch (err) {
+      setError(err.response?.data?.detail || "Upload failed");
+    } finally {
+      setMediaUploading(-1);
+    }
+  };
+
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!form.image) {
       setError("Upload an image or paste an image URL");
+      return;
+    }
+    const media = form.media
+      .filter((m) => m.url)
+      .map((m) => ({ ...m, type: VIDEO_RE.test(m.url) ? "video" : m.type }));
+    if (media.some((m) => !m.label.trim())) {
+      setError("Give every extra media item a label (e.g. Wireframe, UV Map, Turntable)");
       return;
     }
     setSaving(true);
@@ -64,6 +107,7 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
       description: form.description,
       software: form.software.split(",").map((s) => s.trim()).filter(Boolean),
       polycount: form.polycount,
+      media,
     };
     try {
       if (initial) {
@@ -147,6 +191,76 @@ export default function ArtworkForm({ initial, onSave, onCancel }) {
             <img src={previewSrc} alt="Preview" className="h-28 w-44 border border-white/10 object-cover" data-testid="form-image-preview" />
           )}
         </div>
+      </div>
+      <div className="mt-6">
+        <label className={labelCls}>Extra Media — wireframes, UV maps, alt renders, videos</label>
+        {form.media.map((m, i) => (
+          <div key={i} className="mb-3 flex flex-col gap-3 border border-white/10 p-4 md:flex-row md:items-center" data-testid={`media-row-${i}`}>
+            {m.url && m.type !== "video" && !VIDEO_RE.test(m.url) ? (
+              <img
+                src={m.url.startsWith("/api/") ? `${BACKEND}${m.url}` : m.url}
+                alt={m.label || "Media preview"}
+                className="h-14 w-20 border border-white/10 object-cover"
+              />
+            ) : m.url ? (
+              <span className="font-code flex h-14 w-20 shrink-0 items-center justify-center border border-white/10 text-[9px] uppercase tracking-[0.2em] text-[#00F0FF]">
+                Video
+              </span>
+            ) : (
+              <span className="h-14 w-20 shrink-0 border border-dashed border-white/15" />
+            )}
+            <input
+              value={m.label}
+              onChange={(e) => setMedia(i, { label: e.target.value })}
+              placeholder="Label (Wireframe, UV Map...)"
+              className={`${inputCls} md:w-56`}
+              data-testid={`media-label-${i}`}
+            />
+            <input
+              value={m.url}
+              onChange={(e) => setMedia(i, { url: e.target.value, type: VIDEO_RE.test(e.target.value) ? "video" : "image" })}
+              placeholder="Paste URL or upload"
+              className={`${inputCls} flex-1`}
+              data-testid={`media-url-${i}`}
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => mediaRefs.current[i]?.click()}
+                disabled={mediaUploading === i}
+                className="font-code border border-white/20 px-3 py-2 text-[10px] uppercase tracking-[0.2em] text-white/70 transition-colors duration-300 hover:border-[#00F0FF] hover:text-[#00F0FF] disabled:opacity-40"
+                data-testid={`media-upload-${i}`}
+              >
+                {mediaUploading === i ? "..." : "Upload"}
+              </button>
+              <input
+                ref={(el) => (mediaRefs.current[i] = el)}
+                type="file"
+                accept="image/*,video/*"
+                onChange={(e) => onMediaUpload(i, e)}
+                className="hidden"
+                data-testid={`media-file-${i}`}
+              />
+              <button
+                type="button"
+                onClick={() => removeMedia(i)}
+                aria-label="Remove media item"
+                className="flex items-center border border-white/20 px-3 py-2 text-white/70 transition-colors duration-300 hover:border-[#FF003C] hover:text-[#FF003C]"
+                data-testid={`media-remove-${i}`}
+              >
+                <X size={12} />
+              </button>
+            </div>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={addMedia}
+          className="font-code border border-dashed border-white/25 px-4 py-2 text-[10px] uppercase tracking-[0.25em] text-white/60 transition-colors duration-300 hover:border-[#00F0FF] hover:text-[#00F0FF]"
+          data-testid="add-media-btn"
+        >
+          + Add Media
+        </button>
       </div>
       <div className="mt-8 flex gap-4">
         <button

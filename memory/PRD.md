@@ -18,6 +18,13 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 2)
+- Multi-media per artwork: media[] array (type image|video, url, label) on the artwork model
+- Admin form "Extra Media" section: add/remove rows, per-row upload or URL paste, labels (Wireframe, UV Map, Turntable...), video detection by extension
+- Upload endpoint accepts videos (mp4/webm/mov, 150MB) in addition to images (15MB), returns kind
+- Public detail modal: thumbnail strip over the main view, label chip (e.g. WIREFRAME), videos play inline with controls
+- Demo media added to NEON ORACLE using MOCKED placeholder stock images/dummy video
+
 ## Implemented (2026-08-17, update)
 - Admin panel: JWT cookie auth (12h token, bcrypt, brute-force lockout 5 tries/15 min), routes /admin/login and /admin
 - Admin CRUD: create/edit/delete artworks with form (title, category, year, software, polycount, description)

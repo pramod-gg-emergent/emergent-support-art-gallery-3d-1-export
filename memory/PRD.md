@@ -18,6 +18,10 @@
 - Art director / recruiter browsing portfolio quickly
 - Fellow artists exploring process detail (software, polycount)
 
+## Implemented (2026-08-17, update 7)
+- Square/1:1 images no longer squeezed: modal aspect detection widened (ratio > 0.85 = stacked layout); stacked images render object-contain over a blurred self-backdrop
+- Default premium grade (LUT-style) baked into every uploaded image server-side via Pillow: contrast 1.06, color 1.08, sharpness 1.12, brightness 1.02; GIFs skipped to preserve animation
+
 ## Implemented (2026-08-17, update 6)
 - New "low-poly" (Stylized Low Poly) category end-to-end: backend model, gallery filter with neon active state, labeled cards/modal, admin form option, styled empty state until real pieces are added
 - About aligned to 3D-only; hero third stat restored as "3D / Only discipline"

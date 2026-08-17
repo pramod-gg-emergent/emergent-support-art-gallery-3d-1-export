@@ -160,7 +160,7 @@ export default function Gallery({ artworks }) {
               }`}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className={`relative ${landscape ? "h-[42vh] w-full shrink-0 md:h-[60vh]" : "h-[40vh] md:h-[90vh]"}`}>
+              <div className={`relative overflow-hidden ${landscape ? "h-[42vh] w-full shrink-0 md:h-[60vh]" : "h-[40vh] md:h-[90vh]"}`}>
                 {(() => {
                   const media = [
                     { type: "image", url: selected.image, label: "Hero Render" },
@@ -185,16 +185,26 @@ export default function Gallery({ artworks }) {
                           data-testid="artwork-modal-video"
                         />
                       ) : (
-                        <motion.img
-                          layoutId={`art-img-${selected.slug}`}
-                          src={active.url}
-                          alt={`${selected.title} — ${active.label}`}
-                          onLoad={(e) =>
-                            setLandscape(e.target.naturalWidth > e.target.naturalHeight * 1.15)
-                          }
-                          className="h-full w-full object-cover"
-                          data-testid="artwork-modal-image"
-                        />
+                        <>
+                          {landscape && (
+                            <img
+                              src={active.url}
+                              alt=""
+                              aria-hidden="true"
+                              className="absolute inset-0 h-full w-full scale-110 object-cover opacity-40 blur-2xl"
+                            />
+                          )}
+                          <motion.img
+                            layoutId={`art-img-${selected.slug}`}
+                            src={active.url}
+                            alt={`${selected.title} — ${active.label}`}
+                            onLoad={(e) =>
+                              setLandscape(e.target.naturalWidth > e.target.naturalHeight * 0.85)
+                            }
+                            className={`h-full w-full ${landscape ? "relative object-contain" : "object-cover"}`}
+                            data-testid="artwork-modal-image"
+                          />
+                        </>
                       )}
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 to-transparent md:bg-gradient-to-r" />
                       <span

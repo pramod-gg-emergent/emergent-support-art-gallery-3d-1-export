@@ -16,8 +16,10 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 import bcrypt
+import io
 import jwt
 import requests
+from PIL import Image, ImageEnhance
 
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
@@ -262,6 +264,23 @@ async def delete_artwork(slug: str, user=Depends(get_current_user)):
     await db.artworks.delete_one({"slug": slug})
     return {"ok": True}
 
+def grade_image(data: bytes, ext: str):
+    img = Image.open(io.BytesIO(data))
+    if img.mode not in ("RGB", "RGBA"):
+        img = img.convert("RGB")
+    img = ImageEnhance.Contrast(img).enhance(1.06)
+    img = ImageEnhance.Color(img).enhance(1.08)
+    img = ImageEnhance.Sharpness(img).enhance(1.12)
+    img = ImageEnhance.Brightness(img).enhance(1.02)
+    buf = io.BytesIO()
+    if ext == "png":
+        img.save(buf, "PNG")
+        return buf.getvalue(), "image/png"
+    if img.mode == "RGBA":
+        img = img.convert("RGB")
+    img.save(buf, "JPEG", quality=92)
+    return buf.getvalue(), "image/jpeg"
+
 ALLOWED_IMAGE_EXTS = {"jpg", "jpeg", "png", "webp", "gif"}
 ALLOWED_VIDEO_EXTS = {"mp4", "webm", "mov"}
 ALLOWED_MODEL_EXTS = {"mview"}
@@ -278,6 +297,11 @@ async def upload_image(file: UploadFile = File(...), user=Depends(get_current_us
         raise HTTPException(status_code=400, detail="Images must be under 15MB, videos and 3D scenes under 150MB")
     default_type = {"image": "image/jpeg", "video": "video/mp4", "model": "application/octet-stream"}[kind]
     content_type = file.content_type or default_type
+    if kind == "image" and ext != "gif":
+        try:
+            data, content_type = grade_image(data, ext)
+        except Exception:
+            logger.warning("Image grading failed, storing original")
     path = f"{APP_NAME}/uploads/{uuid.uuid4()}.{ext}"
     result = put_object(path, data, content_type)
     await db.files.insert_one({
